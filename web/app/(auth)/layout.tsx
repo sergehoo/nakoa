@@ -21,7 +21,7 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
             </blockquote>
             <div>
               <p className="font-semibold">Aïssata Diallo</p>
-              <p className="text-sm text-white/70">Directrice marketing — Agence Brand'O, Abidjan</p>
+              <p className="text-sm text-white/70">Directrice marketing — Agence Brand&apos;O, Abidjan</p>
             </div>
           </div>
         </div>
