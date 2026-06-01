@@ -2,8 +2,10 @@
 # Nakoa — .gitignore racine
 # ============================================================
 # Fichiers documentation/markdown exclus du repo (gérés hors git)
+# Exceptions : tous les README.md sont préservés (utiles sur GitHub)
 *.md
-!**/node_modules/**/*.md   # ne pas réagir dans les deps
+!README.md
+!**/README.md
 
 # ============================================================
 # OS
