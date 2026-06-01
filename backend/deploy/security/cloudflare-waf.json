@@ -1,0 +1,39 @@
+{
+  "comment": "Règles WAF Cloudflare PrintHub — copier-coller dans Cloudflare Rules",
+  "rules": [
+    {
+      "name": "Rate limit auth endpoints",
+      "expression": "(http.request.uri.path matches \"/api/v1/auth/(login|register|otp|password-reset)\")",
+      "action": "rate_limit",
+      "limit": {"requests": 10, "period": 60}
+    },
+    {
+      "name": "Block tor exit nodes on payments",
+      "expression": "(http.request.uri.path contains \"/api/v1/payments/\" and ip.src in $tor_exit_nodes)",
+      "action": "block"
+    },
+    {
+      "name": "Geo restrict admin",
+      "expression": "(http.request.uri.path contains \"/admin/\" and not ip.geoip.country in {\"CI\" \"SN\" \"BJ\" \"FR\"})",
+      "action": "challenge"
+    },
+    {
+      "name": "Block known bad bots",
+      "expression": "(http.user_agent contains \"sqlmap\" or http.user_agent contains \"nikto\" or http.user_agent contains \"masscan\")",
+      "action": "block"
+    },
+    {
+      "name": "Challenge suspicious BAT uploads",
+      "expression": "(http.request.uri.path contains \"/storage/presigned/\" and http.request.body.size > 104857600)",
+      "action": "challenge"
+    }
+  ],
+  "security_headers": {
+    "Strict-Transport-Security": "max-age=31536000; includeSubDomains; preload",
+    "Content-Security-Policy": "default-src 'self'; img-src 'self' https: data:; connect-src 'self' wss://ws.printhub.io https://api.printhub.io; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com",
+    "X-Frame-Options": "DENY",
+    "X-Content-Type-Options": "nosniff",
+    "Referrer-Policy": "same-origin",
+    "Permissions-Policy": "geolocation=(self), camera=(self), microphone=()"
+  }
+}

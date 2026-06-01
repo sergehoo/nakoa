@@ -1,0 +1,52 @@
+groups:
+  - name: printhub.critical
+    interval: 30s
+    rules:
+      - alert: APIDown
+        expr: up{job="printhub-api"} == 0
+        for: 2m
+        labels:
+          severity: critical
+        annotations:
+          summary: "L'API PrintHub est inaccessible"
+          description: "Le service api est down depuis {{ $value }} minutes."
+
+      - alert: HighErrorRate
+        expr: sum(rate(django_http_responses_total_by_status_total{status=~"5.."}[5m])) / sum(rate(django_http_responses_total_by_status_total[5m])) > 0.05
+        for: 5m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Taux d'erreur 5xx supérieur à 5 %"
+
+      - alert: HighLatency
+        expr: histogram_quantile(0.95, sum(rate(django_http_requests_latency_seconds_bucket[5m])) by (le)) > 2.0
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Latence P95 > 2 s"
+
+      - alert: CeleryQueueBacklog
+        expr: celery_queue_length > 1000
+        for: 10m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Queue Celery > 1000 tâches"
+
+      - alert: PaymentWebhookFailure
+        expr: increase(printhub_payment_webhook_failures_total[10m]) > 5
+        for: 5m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Échecs répétés sur les webhooks paiement"
+
+      - alert: DatabaseConnectionsHigh
+        expr: pg_stat_database_numbackends > 80
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Connexions PostgreSQL > 80"

@@ -1,0 +1,56 @@
+{
+  "common": {
+    "loading": "Loading…",
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "edit": "Edit",
+    "search": "Search",
+    "next": "Next",
+    "previous": "Previous",
+    "submit": "Submit",
+    "back": "Back"
+  },
+  "auth": {
+    "signIn": "Sign in",
+    "signUp": "Create an account",
+    "email": "Email",
+    "password": "Password",
+    "phone": "Phone",
+    "forgotPassword": "Forgot password?",
+    "rememberMe": "Remember me",
+    "twoFactor": "Two-factor authentication",
+    "otpCode": "Code received by SMS / email",
+    "logout": "Logout"
+  },
+  "navigation": {
+    "dashboard": "Dashboard",
+    "catalog": "Catalog",
+    "orders": "Orders",
+    "quotes": "Quotes",
+    "production": "Production",
+    "billing": "Billing",
+    "team": "Team",
+    "settings": "Settings"
+  },
+  "orderStatus": {
+    "draft": "Draft",
+    "quote_pending": "Quote pending",
+    "quoted": "Quote ready",
+    "bat_uploaded": "Proof uploaded",
+    "bat_validated": "Proof validated",
+    "payment_pending": "Awaiting payment",
+    "paid": "Paid",
+    "assigned": "Assigned",
+    "accepted": "Accepted",
+    "in_production": "In production",
+    "quality_check": "Quality check",
+    "ready_for_pickup": "Ready",
+    "in_delivery": "In delivery",
+    "delivered": "Delivered",
+    "completed": "Completed",
+    "cancelled": "Cancelled",
+    "disputed": "Disputed",
+    "refunded": "Refunded"
+  }
+}

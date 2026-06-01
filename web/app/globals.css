@@ -1,0 +1,249 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* Palette monochrome premium — neutres sophistiqués + 1 accent indigo profond */
+    --background: 0 0% 100%;
+    --foreground: 222 25% 8%;
+    --card: 0 0% 100%;
+    --card-foreground: 222 25% 8%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 222 25% 8%;
+
+    /* Accent principal : indigo profond éditorial */
+    --primary: 222 47% 14%;
+    --primary-foreground: 0 0% 100%;
+
+    /* Neutres sophistiqués */
+    --secondary: 220 13% 96%;
+    --secondary-foreground: 222 25% 12%;
+    --muted: 220 14% 96%;
+    --muted-foreground: 220 8% 46%;
+    --accent: 220 14% 96%;
+    --accent-foreground: 222 25% 12%;
+
+    /* Statuts subtils */
+    --destructive: 0 72% 51%;
+    --destructive-foreground: 0 0% 100%;
+    --success: 142 71% 45%;
+    --success-foreground: 0 0% 100%;
+    --warning: 35 92% 50%;
+    --warning-foreground: 0 0% 100%;
+
+    --border: 220 13% 91%;
+    --input: 220 13% 91%;
+    --ring: 222 47% 14%;
+    --radius: 0.75rem;
+  }
+
+  .dark {
+    --background: 222 28% 7%;
+    --foreground: 220 10% 96%;
+    --card: 222 28% 10%;
+    --card-foreground: 220 10% 96%;
+    --popover: 222 28% 10%;
+    --popover-foreground: 220 10% 96%;
+    --primary: 220 10% 96%;
+    --primary-foreground: 222 28% 7%;
+    --secondary: 222 24% 16%;
+    --secondary-foreground: 220 10% 96%;
+    --muted: 222 24% 16%;
+    --muted-foreground: 220 8% 65%;
+    --accent: 222 24% 16%;
+    --accent-foreground: 220 10% 96%;
+    --destructive: 0 63% 60%;
+    --destructive-foreground: 220 10% 96%;
+    --success: 142 71% 55%;
+    --success-foreground: 220 10% 96%;
+    --warning: 35 92% 60%;
+    --warning-foreground: 222 28% 7%;
+    --border: 222 24% 18%;
+    --input: 222 24% 18%;
+    --ring: 220 10% 90%;
+  }
+
+  * { @apply border-border; }
+  body {
+    @apply bg-background text-foreground antialiased;
+    font-feature-settings: "rlig" 1, "calt" 1, "ss01" 1;
+  }
+  ::selection { @apply bg-primary/15 text-foreground; }
+}
+
+@layer utilities {
+  .text-balance { text-wrap: balance; }
+  .glass {
+    @apply backdrop-blur-xl bg-background/80 border border-border/60;
+  }
+
+  /* Fond hero : très subtil radial monochrome */
+  .gradient-hero {
+    background-image:
+      radial-gradient(at 30% 20%, hsla(222, 47%, 14%, 0.04) 0px, transparent 50%),
+      radial-gradient(at 70% 80%, hsla(222, 47%, 14%, 0.06) 0px, transparent 50%);
+  }
+
+  /* Aplat brand : indigo profond uniforme */
+  .gradient-brand {
+    background-image: linear-gradient(135deg, hsl(222, 47%, 14%) 0%, hsl(222, 47%, 22%) 100%);
+  }
+
+  /* Texte éditorial : aucun dégradé, juste poids + couleur */
+  .text-emphasis {
+    @apply text-foreground;
+  }
+
+  /* Lignes verticales subtiles pour la grille éditoriale */
+  .grid-paper {
+    background-image:
+      linear-gradient(rgba(0,0,0,0.025) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0,0,0,0.025) 1px, transparent 1px);
+    background-size: 60px 60px;
+  }
+  .dark .grid-paper {
+    background-image:
+      linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
+  }
+
+  /* Animation float très douce */
+  .animate-float { animation: float 8s ease-in-out infinite; }
+  @keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-12px); }
+  }
+
+  /* Marquee subtil pour bandeau partenaires */
+  .animate-marquee { animation: marquee 40s linear infinite; }
+  @keyframes marquee {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(-50%); }
+  }
+
+  /* Carte premium : ombre éditoriale + contour coloré animé au survol */
+  .card-premium {
+    @apply relative border border-border/60 transition-all duration-300;
+    background-color: hsl(var(--card));
+    box-shadow:
+      0 1px 0 0 hsla(220, 13%, 91%, 0.5),
+      0 1px 3px 0 hsla(222, 25%, 8%, 0.04),
+      0 4px 12px -2px hsla(222, 25%, 8%, 0.04);
+    isolation: isolate;
+  }
+
+  /* Variante sombre : pour CTA et bloc Mobile App */
+  .card-premium-dark {
+    @apply relative border transition-all duration-300;
+    background-color: hsl(var(--foreground));
+    color: hsl(var(--background));
+    border-color: hsla(0, 0%, 100%, 0.08);
+    box-shadow:
+      0 1px 3px 0 hsla(222, 25%, 8%, 0.2),
+      0 12px 32px -8px hsla(222, 25%, 8%, 0.3);
+    isolation: isolate;
+  }
+  .card-premium:hover {
+    box-shadow:
+      0 1px 0 0 hsla(220, 13%, 91%, 0.5),
+      0 4px 12px -2px hsla(222, 25%, 8%, 0.08),
+      0 12px 32px -8px hsla(222, 25%, 8%, 0.12);
+  }
+
+  /* Contour coloré animé — utilise un dégradé conique qui tourne au survol */
+  .card-premium::before,
+  .card-premium-dark::before {
+    content: "";
+    position: absolute;
+    inset: -1px;
+    z-index: -1;
+    border-radius: inherit;
+    padding: 1px;
+    background: conic-gradient(
+      from var(--angle, 0deg),
+      hsl(270 95% 60%),
+      hsl(220 95% 70%),
+      hsl(180 95% 50%),
+      hsl(142 71% 55%),
+      hsl(48 100% 55%),
+      hsl(30 100% 55%),
+      hsl(320 95% 60%),
+      hsl(270 95% 60%)
+    );
+    -webkit-mask:
+      linear-gradient(#000 0 0) content-box,
+      linear-gradient(#000 0 0);
+    -webkit-mask-composite: xor;
+            mask-composite: exclude;
+    opacity: 0;
+    transition: opacity 0.4s ease;
+  }
+  .card-premium:hover::before,
+  .card-premium-dark:hover::before {
+    opacity: 1;
+    animation: spin-border 4s linear infinite;
+  }
+
+  @property --angle {
+    syntax: "<angle>";
+    initial-value: 0deg;
+    inherits: false;
+  }
+
+  @keyframes spin-border {
+    to { --angle: 360deg; }
+  }
+
+  /* Fallback pour navigateurs sans @property : pseudo-rotation par transform */
+  @supports not (background: conic-gradient(from 0deg, red, blue)) {
+    .card-premium::before,
+    .card-premium-dark::before {
+      background: linear-gradient(
+        135deg,
+        hsl(270 95% 60%),
+        hsl(220 95% 70%),
+        hsl(180 95% 50%),
+        hsl(48 100% 55%),
+        hsl(320 95% 60%)
+      );
+      background-size: 300% 300%;
+    }
+    .card-premium:hover::before,
+    .card-premium-dark:hover::before {
+      animation: shift-border 4s ease infinite;
+    }
+    @keyframes shift-border {
+      0%, 100% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+    }
+  }
+
+  /* Variante : contour coloré sur boutons et CTA */
+  .glow-border {
+    position: relative;
+    isolation: isolate;
+  }
+  .glow-border::after {
+    content: "";
+    position: absolute;
+    inset: -2px;
+    z-index: -1;
+    border-radius: inherit;
+    background: conic-gradient(
+      from var(--angle, 0deg),
+      hsl(270 95% 60%),
+      hsl(220 95% 70%),
+      hsl(180 95% 50%),
+      hsl(320 95% 60%),
+      hsl(270 95% 60%)
+    );
+    opacity: 0;
+    filter: blur(8px);
+    transition: opacity 0.4s ease;
+  }
+  .glow-border:hover::after {
+    opacity: 0.6;
+    animation: spin-border 3s linear infinite;
+  }
+}

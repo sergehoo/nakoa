@@ -1,0 +1,56 @@
+{
+  "common": {
+    "loading": "Chargement…",
+    "save": "Enregistrer",
+    "cancel": "Annuler",
+    "delete": "Supprimer",
+    "edit": "Modifier",
+    "search": "Rechercher",
+    "next": "Suivant",
+    "previous": "Précédent",
+    "submit": "Valider",
+    "back": "Retour"
+  },
+  "auth": {
+    "signIn": "Se connecter",
+    "signUp": "Créer un compte",
+    "email": "Email",
+    "password": "Mot de passe",
+    "phone": "Téléphone",
+    "forgotPassword": "Mot de passe oublié ?",
+    "rememberMe": "Se souvenir de moi",
+    "twoFactor": "Authentification à deux facteurs",
+    "otpCode": "Code reçu par SMS / email",
+    "logout": "Déconnexion"
+  },
+  "navigation": {
+    "dashboard": "Tableau de bord",
+    "catalog": "Catalogue",
+    "orders": "Commandes",
+    "quotes": "Devis",
+    "production": "Production",
+    "billing": "Facturation",
+    "team": "Équipe",
+    "settings": "Paramètres"
+  },
+  "orderStatus": {
+    "draft": "Brouillon",
+    "quote_pending": "Devis en attente",
+    "quoted": "Devis disponible",
+    "bat_uploaded": "BAT déposé",
+    "bat_validated": "BAT validé",
+    "payment_pending": "Paiement en attente",
+    "paid": "Payée",
+    "assigned": "Attribuée",
+    "accepted": "Acceptée",
+    "in_production": "En production",
+    "quality_check": "Contrôle qualité",
+    "ready_for_pickup": "Prête",
+    "in_delivery": "En livraison",
+    "delivered": "Livrée",
+    "completed": "Clôturée",
+    "cancelled": "Annulée",
+    "disputed": "En litige",
+    "refunded": "Remboursée"
+  }
+}

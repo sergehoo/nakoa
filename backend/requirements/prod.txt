@@ -1,0 +1,5 @@
+-r base.txt
+
+# Production-only extras
+sentry-sdk[django]==2.7.1
+ddtrace==2.9.2

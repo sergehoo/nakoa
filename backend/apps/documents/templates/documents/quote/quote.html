@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<title>Devis {{ order.reference }}</title>
+<style>
+  @page { size: A4; margin: 20mm 15mm; }
+  body { font-family: "Helvetica", sans-serif; color: #222; font-size: 10pt; }
+  .header { display: flex; justify-content: space-between; border-bottom: 2px solid #1F3A5F; padding-bottom: 12pt; }
+  .brand { font-size: 22pt; font-weight: 700; color: #1F3A5F; }
+  h1 { color: #1F3A5F; }
+  .box { background: #F7F9FC; padding: 12pt; border-radius: 6pt; margin-bottom: 12pt; }
+  table { width: 100%; border-collapse: collapse; margin: 18pt 0; }
+  th { background: #1F3A5F; color: white; padding: 8pt; text-align: left; }
+  td { padding: 8pt; border-bottom: 1px solid #E2E8F0; }
+  .total { font-size: 16pt; font-weight: 700; color: #1F3A5F; text-align: right; }
+</style>
+</head>
+<body>
+<div class="header">
+  <div>
+    <div class="brand">PrintHub</div>
+    <div>Devis valable 30 jours</div>
+  </div>
+  <div style="text-align: right;">
+    <h1 style="margin: 0;">DEVIS</h1>
+    <div>N° {{ order.reference }}</div>
+    <div>Émis le {{ order.created_at|date:"d/m/Y" }}</div>
+  </div>
+</div>
+
+<div class="box" style="margin-top: 24pt;">
+  <strong>Client</strong><br>
+  {{ customer.full_name }} — {{ customer.email }}
+</div>
+
+{% if printer %}
+<div class="box">
+  <strong>Imprimeur</strong><br>
+  {{ printer.trade_name }} — {{ printer.city }}
+</div>
+{% endif %}
+
+<table>
+  <thead>
+    <tr>
+      <th>Produit</th>
+      <th>Quantité</th>
+      <th>Prix unitaire HT</th>
+      <th>Total HT</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>{{ product.name }}</td>
+      <td>{{ order.quantity }}</td>
+      <td>{{ order.unit_price_excl_tax }} {{ order.currency }}</td>
+      <td>{{ order.total_excl_tax }} {{ order.currency }}</td>
+    </tr>
+  </tbody>
+</table>
+
+<div class="total">
+  Total TTC : {{ order.total_incl_tax }} {{ order.currency }}
+</div>
+
+<p style="margin-top: 36pt; font-size: 9pt; color: #555;">
+  Délai de livraison estimé : {{ order.expected_delivery_at|date:"d/m/Y" }}.<br>
+  Inclus : analyse BAT par IA, garantie qualité PrintHub Care, suivi production temps réel.
+</p>
+</body>
+</html>

@@ -1,0 +1,6 @@
+from rest_framework.routers import DefaultRouter
+from .viewsets import DocumentViewSet
+
+router = DefaultRouter()
+router.register("", DocumentViewSet, basename="document")
+urlpatterns = router.urls

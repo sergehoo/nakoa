@@ -1,0 +1,48 @@
+import type { Metadata, Viewport } from "next";
+import { Inter, Sora } from "next/font/google";
+import { NextIntlClientProvider } from "next-intl";
+import { getMessages } from "next-intl/server";
+
+import { Providers } from "@/components/providers";
+import "./globals.css";
+
+const inter = Inter({ subsets: ["latin"], variable: "--font-inter", display: "swap" });
+const sora = Sora({ subsets: ["latin"], variable: "--font-display", display: "swap" });
+
+export const metadata: Metadata = {
+  title: { default: "PrintHub — Imprimer simplement", template: "%s · PrintHub" },
+  description:
+    "Plateforme SaaS d'impression : marketplace intelligente, ERP de production et IA — pour l'Afrique de l'Ouest.",
+  keywords: ["imprimerie", "impression", "marketplace", "Côte d'Ivoire", "Mobile Money"],
+  authors: [{ name: "PrintHub" }],
+  openGraph: {
+    type: "website",
+    locale: "fr_FR",
+    url: "https://printhub.io",
+    title: "PrintHub — Imprimer simplement",
+    description: "La plateforme intelligente d'impression pour l'Afrique de l'Ouest.",
+    siteName: "PrintHub",
+  },
+};
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: "#ffffff" },
+    { media: "(prefers-color-scheme: dark)", color: "#0b0f17" },
+  ],
+};
+
+export default async function RootLayout({ children }: { children: React.ReactNode }) {
+  const messages = await getMessages();
+  return (
+    <html lang="fr" suppressHydrationWarning className={`${inter.variable} ${sora.variable}`}>
+      <body className="min-h-screen bg-background font-sans antialiased">
+        <NextIntlClientProvider messages={messages}>
+          <Providers>{children}</Providers>
+        </NextIntlClientProvider>
+      </body>
+    </html>
+  );
+}

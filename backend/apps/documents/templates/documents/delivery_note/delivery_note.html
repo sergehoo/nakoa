@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<title>Bon de livraison {{ order.reference }}</title>
+<style>
+  @page { size: A4; margin: 20mm 15mm; }
+  body { font-family: "Helvetica", sans-serif; color: #222; font-size: 10pt; }
+  .header { display: flex; justify-content: space-between; border-bottom: 2px solid #1F3A5F; padding-bottom: 12pt; }
+  .brand { font-size: 22pt; font-weight: 700; color: #1F3A5F; }
+  h1 { color: #1F3A5F; }
+  .grid { display: flex; gap: 24pt; margin: 24pt 0; }
+  .box { flex: 1; background: #F7F9FC; padding: 12pt; border-radius: 6pt; }
+  .qr { text-align: center; margin: 24pt 0; }
+  .qr-code { font-family: monospace; padding: 12pt; background: #fff; border: 2px dashed #1F3A5F; display: inline-block; }
+  .sig { display: flex; gap: 24pt; margin-top: 48pt; }
+  .sig-block { flex: 1; border-top: 1px solid #888; padding-top: 8pt; text-align: center; font-size: 9pt; }
+</style>
+</head>
+<body>
+<div class="header">
+  <div>
+    <div class="brand">PrintHub</div>
+  </div>
+  <div style="text-align: right;">
+    <h1 style="margin: 0;">BON DE LIVRAISON</h1>
+    <div>Commande {{ order.reference }}</div>
+  </div>
+</div>
+
+<div class="grid">
+  <div class="box">
+    <strong>Expéditeur</strong><br>
+    {{ order.printer.trade_name }}<br>
+    {{ order.printer.address }}<br>
+    {{ order.printer.city }}, {{ order.printer.country }}
+  </div>
+  <div class="box">
+    <strong>Destinataire</strong><br>
+    {{ order.customer.full_name }}<br>
+    {{ order.delivery_address.address }}<br>
+    {{ order.delivery_address.city }}, {{ order.delivery_address.country }}
+  </div>
+</div>
+
+<table style="width: 100%; border-collapse: collapse;">
+  <tr style="background: #1F3A5F; color: white;">
+    <th style="padding: 8pt; text-align: left;">Produit</th>
+    <th style="padding: 8pt; text-align: right;">Quantité</th>
+  </tr>
+  <tr>
+    <td style="padding: 8pt; border-bottom: 1px solid #E2E8F0;">{{ order.product.name }}</td>
+    <td style="padding: 8pt; text-align: right; border-bottom: 1px solid #E2E8F0;">{{ order.quantity }}</td>
+  </tr>
+</table>
+
+<div class="qr">
+  <p>Code de validation</p>
+  <div class="qr-code">{{ qr_data }}</div>
+  <p style="font-size: 9pt; color: #888;">Scannez ce code dans l'app PrintHub pour confirmer la livraison.</p>
+</div>
+
+<div class="sig">
+  <div class="sig-block">Signature livreur</div>
+  <div class="sig-block">Signature client</div>
+</div>
+
+<p style="margin-top: 36pt; font-size: 8pt; color: #888; text-align: center;">
+  Edité par PrintHub le {{ order.delivered_at|default:order.created_at|date:"d/m/Y H:i" }}
+</p>
+</body>
+</html>
