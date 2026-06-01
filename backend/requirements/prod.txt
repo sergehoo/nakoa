@@ -3,3 +3,6 @@
 # Production-only extras
 sentry-sdk[django]==2.7.1
 ddtrace==2.9.2
+
+# Logging JSON structuré (référencé dans config.settings.production)
+python-json-logger>=2.0.7
