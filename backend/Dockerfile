@@ -19,6 +19,11 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     libpangoft2-1.0-0 \
     libgdk-pixbuf-xlib-2.0-0 \
     libffi-dev \
+    # GeoDjango / PostGIS deps
+    gdal-bin \
+    libgdal-dev \
+    libgeos-dev \
+    libproj-dev \
     && rm -rf /var/lib/apt/lists/*
 
 COPY requirements/ requirements/
@@ -43,6 +48,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     libgdk-pixbuf-xlib-2.0-0 \
     curl \
     netcat-openbsd \
+    # GeoDjango runtime : gdal-bin tire libgdal32 + libgeos + libproj automatiquement
+    gdal-bin \
     && rm -rf /var/lib/apt/lists/* \
     && useradd --create-home --uid 1000 printhub
 
