@@ -10,7 +10,7 @@ export function SiteFooter() {
             <div className="flex h-8 w-8 items-center justify-center rounded-lg gradient-brand text-white">
               <Printer className="h-4 w-4" />
             </div>
-            <span className="font-display text-base font-bold">PrintHub</span>
+            <span className="font-display text-base font-bold">Nakoa</span>
           </Link>
           <p className="mt-3 text-sm text-muted-foreground">
             Imprimer simplement, partout en Afrique de l&apos;Ouest.
@@ -46,7 +46,7 @@ export function SiteFooter() {
       </div>
       <div className="border-t py-6">
         <div className="container flex flex-col items-center justify-between gap-2 text-sm text-muted-foreground md:flex-row">
-          <p>© {new Date().getFullYear()} PrintHub. Tous droits réservés.</p>
+          <p>© {new Date().getFullYear()} Nakoa. Tous droits réservés.</p>
           <p>Abidjan · Dakar · Cotonou</p>
         </div>
       </div>

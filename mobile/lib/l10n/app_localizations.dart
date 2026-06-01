@@ -13,7 +13,7 @@ class AppLocalizations {
 
   static const Map<String, Map<String, String>> _values = {
     'fr': {
-      'app.name': 'PrintHub',
+      'app.name': 'Nakoa',
       'auth.signIn': 'Se connecter',
       'auth.signUp': 'Créer un compte',
       'auth.email': 'Email',
@@ -36,7 +36,7 @@ class AppLocalizations {
       'common.retry': 'Réessayer',
     },
     'en': {
-      'app.name': 'PrintHub',
+      'app.name': 'Nakoa',
       'auth.signIn': 'Sign in',
       'auth.signUp': 'Create account',
       'auth.email': 'Email',

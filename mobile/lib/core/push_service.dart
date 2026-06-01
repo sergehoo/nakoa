@@ -53,8 +53,8 @@ class PushService {
       const NotificationDetails(
         android: AndroidNotificationDetails(
           'printhub_default',
-          'PrintHub',
-          channelDescription: 'Notifications PrintHub',
+          'Nakoa',
+          channelDescription: 'Notifications Nakoa',
           importance: Importance.high,
           priority: Priority.high,
         ),

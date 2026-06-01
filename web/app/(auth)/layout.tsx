@@ -12,11 +12,11 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
             <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-white/20 backdrop-blur">
               <Printer className="h-5 w-5" />
             </div>
-            <span className="font-display text-lg font-bold tracking-tight">PrintHub</span>
+            <span className="font-display text-lg font-bold tracking-tight">Nakoa</span>
           </Link>
           <div className="mt-auto space-y-6">
             <blockquote className="text-2xl font-medium leading-snug text-balance">
-              « PrintHub a divisé par 3 le temps que nous passions à comparer des imprimeurs.
+              « Nakoa a divisé par 3 le temps que nous passions à comparer des imprimeurs.
               Aujourd&apos;hui, on commande en 5 minutes. »
             </blockquote>
             <div>

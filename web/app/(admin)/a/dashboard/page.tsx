@@ -29,7 +29,7 @@ export default function AdminDashboard() {
     <div className="space-y-6">
       <div>
         <h1 className="font-display text-3xl font-bold tracking-tight">Pilotage plateforme</h1>
-        <p className="text-sm text-muted-foreground">Vue d&apos;ensemble PrintHub — 30 derniers jours.</p>
+        <p className="text-sm text-muted-foreground">Vue d&apos;ensemble Nakoa — 30 derniers jours.</p>
       </div>
 
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">

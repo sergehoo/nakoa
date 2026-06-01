@@ -98,7 +98,7 @@ export function AiAssistantDrawer() {
                 <Sparkles className="h-4 w-4" />
               </div>
               <div>
-                <p className="font-semibold">Assistant PrintHub</p>
+                <p className="font-semibold">Assistant Nakoa</p>
                 <p className="text-xs text-muted-foreground capitalize">{role}</p>
               </div>
             </div>

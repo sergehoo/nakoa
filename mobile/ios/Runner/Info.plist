@@ -5,7 +5,7 @@
     <key>CFBundleDevelopmentRegion</key>
     <string>fr</string>
     <key>CFBundleDisplayName</key>
-    <string>PrintHub</string>
+    <string>Nakoa</string>
     <key>CFBundleExecutable</key>
     <string>$(EXECUTABLE_NAME)</string>
     <key>CFBundleIdentifier</key>
@@ -13,7 +13,7 @@
     <key>CFBundleInfoDictionaryVersion</key>
     <string>6.0</string>
     <key>CFBundleName</key>
-    <string>PrintHub</string>
+    <string>Nakoa</string>
     <key>CFBundlePackageType</key>
     <string>APPL</string>
     <key>CFBundleShortVersionString</key>
@@ -37,17 +37,17 @@
 
     <!-- Permissions PrintHub -->
     <key>NSCameraUsageDescription</key>
-    <string>PrintHub utilise la caméra pour scanner les QR codes des jobs atelier et capturer les preuves de livraison.</string>
+    <string>Nakoa utilise la caméra pour scanner les QR codes des jobs atelier et capturer les preuves de livraison.</string>
     <key>NSPhotoLibraryUsageDescription</key>
-    <string>PrintHub accède à vos photos pour téléverser des BAT.</string>
+    <string>Nakoa accède à vos photos pour téléverser des BAT.</string>
     <key>NSPhotoLibraryAddUsageDescription</key>
-    <string>PrintHub enregistre les preuves de livraison signées dans votre galerie.</string>
+    <string>Nakoa enregistre les preuves de livraison signées dans votre galerie.</string>
     <key>NSLocationWhenInUseUsageDescription</key>
-    <string>PrintHub utilise votre position pour le suivi de livraison en temps réel.</string>
+    <string>Nakoa utilise votre position pour le suivi de livraison en temps réel.</string>
     <key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
-    <string>PrintHub suit votre position en arrière-plan pendant les tournées de livraison.</string>
+    <string>Nakoa suit votre position en arrière-plan pendant les tournées de livraison.</string>
     <key>NSLocationAlwaysUsageDescription</key>
-    <string>PrintHub suit votre position en arrière-plan pendant les tournées de livraison.</string>
+    <string>Nakoa suit votre position en arrière-plan pendant les tournées de livraison.</string>
 
     <!-- Sécurité réseau (en dev autorise HTTP localhost) -->
     <key>NSAppTransportSecurity</key>

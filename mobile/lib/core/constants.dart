@@ -2,7 +2,7 @@
 class AppConstants {
   AppConstants._();
 
-  static const String appName = 'PrintHub';
+  static const String appName = 'Nakoa';
   static const Duration httpTimeout = Duration(seconds: 30);
   static const Duration httpReceiveTimeout = Duration(seconds: 30);
 

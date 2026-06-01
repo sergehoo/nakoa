@@ -138,7 +138,7 @@ class _VersionFooter extends StatelessWidget {
         padding: const EdgeInsets.all(24),
         child: Center(
           child: Text(
-            snap.hasData ? 'PrintHub v${snap.data!.version} • build ${snap.data!.buildNumber}' : 'PrintHub',
+            snap.hasData ? 'Nakoa v${snap.data!.version} • build ${snap.data!.buildNumber}' : 'Nakoa',
             style: TextStyle(fontSize: 11, color: Theme.of(context).hintColor),
           ),
         ),

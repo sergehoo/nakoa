@@ -20,7 +20,7 @@
 <body>
 <div class="header">
   <div>
-    <div class="brand">PrintHub</div>
+    <div class="brand">Nakoa</div>
   </div>
   <div style="text-align: right;">
     <h1 style="margin: 0;">BON DE LIVRAISON</h1>
@@ -57,7 +57,7 @@
 <div class="qr">
   <p>Code de validation</p>
   <div class="qr-code">{{ qr_data }}</div>
-  <p style="font-size: 9pt; color: #888;">Scannez ce code dans l'app PrintHub pour confirmer la livraison.</p>
+  <p style="font-size: 9pt; color: #888;">Scannez ce code dans l'app Nakoa pour confirmer la livraison.</p>
 </div>
 
 <div class="sig">
@@ -66,7 +66,7 @@
 </div>
 
 <p style="margin-top: 36pt; font-size: 8pt; color: #888; text-align: center;">
-  Edité par PrintHub le {{ order.delivered_at|default:order.created_at|date:"d/m/Y H:i" }}
+  Edité par Nakoa le {{ order.delivered_at|default:order.created_at|date:"d/m/Y H:i" }}
 </p>
 </body>
 </html>

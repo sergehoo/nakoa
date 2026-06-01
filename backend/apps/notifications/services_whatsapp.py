@@ -155,7 +155,7 @@ def _handle_text(from_phone: str, text: str, msg_id: str) -> dict:
         # Onboarding express : on crée un compte client de base
         import secrets
         user = User.objects.create_user(
-            email=f"wa-{from_phone}@whatsapp.printhub.io",
+            email=f"wa-{from_phone}@whatsapp.nakoa.io",
             password=secrets.token_urlsafe(20),
             phone=f"+{from_phone}",
             primary_role="customer",
@@ -195,7 +195,7 @@ def _handle_button(from_phone: str, button_id: str, msg_id: str) -> dict:
     if button_id.startswith("pay_order_"):
         order_id = button_id.replace("pay_order_", "")
         # TODO : générer lien CinetPay + envoyer
-        send_text(from_phone, f"💳 Lien de paiement : https://pay.printhub.io/{order_id}")
+        send_text(from_phone, f"💳 Lien de paiement : https://pay.nakoa.io/{order_id}")
     elif button_id.startswith("accept_offer_"):
         offer_id = button_id.replace("accept_offer_", "")
         send_text(from_phone, f"✅ Offre {offer_id} acceptée. Procédez au paiement.")

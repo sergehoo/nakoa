@@ -1,0 +1,524 @@
+name: nakoa
+# ==============================================================================
+# Nakoa (PrintHub) — Docker Compose Production
+# ==============================================================================
+# Usage :
+#   docker compose -f docker-compose.prod.yml --env-file .env.prod up -d
+#
+# Prérequis serveur :
+#   - Traefik v2/v3 déjà installé sur le serveur, exposé en 80/443
+#   - Réseau Docker externe "proxy" déjà créé : docker network create proxy
+#   - Certresolver Let's Encrypt nommé "lets" (identique smitci)
+#   - DNS A/AAAA pointant vers le serveur pour :
+#       ${NAKOA_HOST}             (frontend public)
+#       api.${NAKOA_HOST}         (API Django)
+#       ws.${NAKOA_HOST}          (WebSockets Channels)
+#       adminer.${NAKOA_HOST}     (admin DB, optionnel)
+#       minio.${NAKOA_HOST}       (MinIO API S3, optionnel)
+#       minio-console.${NAKOA_HOST} (console MinIO, optionnel)
+# ==============================================================================
+
+networks:
+  nakoa_network:
+    name: nakoa_network
+    driver: bridge
+  proxy:
+    external: true
+
+# Volumes : tous préfixés `nakoa_` et figés avec `name:` pour éviter toute
+# collision avec les volumes d'une autre stack présente sur le même hôte
+# (ex. smitci qui utilise pgdata, static_volume, media_volume, dbbackups, logs_volume).
+volumes:
+  nakoa_pgdata:
+    name: nakoa_pgdata
+  nakoa_redis_data:
+    name: nakoa_redis_data
+  nakoa_minio_data:
+    name: nakoa_minio_data
+  nakoa_static:
+    name: nakoa_static
+  nakoa_media:
+    name: nakoa_media
+  nakoa_dbbackups:
+    name: nakoa_dbbackups
+  nakoa_logs:
+    name: nakoa_logs
+  nakoa_es_data:
+    name: nakoa_es_data
+
+x-logging-rotated: &logging_rotated
+  driver: "json-file"
+  options:
+    max-size: "10m"
+    max-file: "3"
+
+x-django-base: &django-base
+  build:
+    context: ./backend
+    dockerfile: Dockerfile
+    args:
+      REQUIREMENTS: prod
+  image: nakoa/backend:${VERSION:-latest}
+  env_file: [.env.prod]
+  environment:
+    TZ: Africa/Abidjan
+    DJANGO_SETTINGS_MODULE: config.settings.production
+    PYTHONUNBUFFERED: "1"
+    FORWARDED_ALLOW_IPS: "*"
+    WHITENOISE_MAX_AGE: "2592000"
+    WHITENOISE_USE_FINDERS: "False"
+    DJANGO_MEDIA_ROOT: /var/www/media
+    MPLCONFIGDIR: /tmp/matplotlib
+  restart: unless-stopped
+  logging: *logging_rotated
+  ulimits:
+    nofile: 65535
+
+services:
+
+  # ===========================================================================
+  # PostgreSQL + PostGIS
+  # ===========================================================================
+  nakoaDB:
+    image: postgis/postgis:16-3.4
+    container_name: nakoa_db
+    hostname: nakoaDB
+    restart: unless-stopped
+    environment:
+      TZ: Africa/Abidjan
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    volumes:
+      - nakoa_pgdata:/var/lib/postgresql/data
+    networks: [nakoa_network]
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB -h 127.0.0.1 || exit 1"]
+      interval: 30s
+      timeout: 5s
+      retries: 10
+    logging: *logging_rotated
+    cpus: "2.0"
+    mem_limit: 2048m
+    mem_reservation: 768m
+    ulimits:
+      nofile: 65535
+
+  # ===========================================================================
+  # Redis (cache + broker Celery + channel layer Django Channels)
+  # ===========================================================================
+  nakoaredis:
+    image: redis:7
+    container_name: nakoa_redis
+    hostname: nakoaredis
+    restart: unless-stopped
+    environment:
+      TZ: Africa/Abidjan
+    command:
+      - "redis-server"
+      - "--appendonly"
+      - "yes"
+      - "--appendfsync"
+      - "everysec"
+      - "--save"
+      - "900 1"
+      - "--maxmemory"
+      - "1gb"
+      - "--maxmemory-policy"
+      - "allkeys-lru"
+    volumes:
+      - nakoa_redis_data:/data
+    networks: [nakoa_network]
+    healthcheck:
+      test: ["CMD-SHELL", "redis-cli -h 127.0.0.1 ping | grep PONG >/dev/null 2>&1 || exit 1"]
+      interval: 30s
+      timeout: 5s
+      retries: 10
+    logging: *logging_rotated
+    cpus: "0.8"
+    mem_limit: 1024m
+    mem_reservation: 256m
+    ulimits:
+      nofile: 65535
+
+  # ===========================================================================
+  # MinIO (S3 compatible — stockage BAT, factures, médias)
+  # Optionnel : retirer si vous utilisez AWS S3 / Backblaze B2 / etc.
+  # ===========================================================================
+  nakoaminio:
+    image: minio/minio:latest
+    container_name: nakoa_minio
+    hostname: nakoaminio
+    restart: unless-stopped
+    environment:
+      TZ: Africa/Abidjan
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD}
+      MINIO_BROWSER_REDIRECT_URL: https://minio-console.${NAKOA_HOST}
+    command: server /data --console-address ":9001"
+    volumes:
+      - nakoa_minio_data:/data
+    networks: [nakoa_network, proxy]
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+      interval: 30s
+      timeout: 5s
+      retries: 10
+    labels:
+      - traefik.enable=true
+      - traefik.docker.network=proxy
+
+      # API S3 (port 9000)
+      - traefik.http.routers.nakoa-minio.rule=Host(`minio.${NAKOA_HOST}`)
+      - traefik.http.routers.nakoa-minio.entrypoints=websecure
+      - traefik.http.routers.nakoa-minio.tls=true
+      - traefik.http.routers.nakoa-minio.tls.certresolver=lets
+      - traefik.http.routers.nakoa-minio.service=nakoa-minio-svc
+      - traefik.http.services.nakoa-minio-svc.loadbalancer.server.port=9000
+
+      # Console (port 9001)
+      - traefik.http.routers.nakoa-minio-console.rule=Host(`minio-console.${NAKOA_HOST}`)
+      - traefik.http.routers.nakoa-minio-console.entrypoints=websecure
+      - traefik.http.routers.nakoa-minio-console.tls=true
+      - traefik.http.routers.nakoa-minio-console.tls.certresolver=lets
+      - traefik.http.routers.nakoa-minio-console.service=nakoa-minio-console-svc
+      - traefik.http.services.nakoa-minio-console-svc.loadbalancer.server.port=9001
+    logging: *logging_rotated
+    cpus: "1.0"
+    mem_limit: 1024m
+    mem_reservation: 384m
+
+  # ===========================================================================
+  # API Django (HTTP / REST) — gunicorn
+  # ===========================================================================
+  nakoaweb:
+    <<: *django-base
+    container_name: nakoa_web
+    hostname: nakoaweb
+    command: >
+      gunicorn config.wsgi:application
+      --bind 0.0.0.0:8000
+      --workers 4 --threads 2
+      --worker-class gthread
+      --worker-tmp-dir /dev/shm
+      --max-requests 800 --max-requests-jitter 200
+      --timeout 120 --graceful-timeout 60
+      --keep-alive 5
+      --log-level info
+      --error-logfile - --access-logfile -
+      --capture-output
+      --forwarded-allow-ips="*"
+    environment:
+      RUN_MIGRATIONS: "0"
+      RUN_COLLECTSTATIC: "0"
+      GUNICORN_CMD_ARGS: "--forwarded-allow-ips=*"
+    volumes:
+      - nakoa_static:/app/staticfiles:rw
+      - nakoa_media:/var/www/media:rw
+      - nakoa_dbbackups:/app/dbbackup
+      - nakoa_logs:/app/logs:rw
+    depends_on:
+      nakoaDB:
+        condition: service_healthy
+      nakoaredis:
+        condition: service_healthy
+    networks: [nakoa_network, proxy]
+    init: true
+    read_only: true
+    tmpfs:
+      - /tmp:size=128m,mode=1777
+    shm_size: "256m"
+    security_opt:
+      - no-new-privileges:true
+    labels:
+      - traefik.enable=true
+      - traefik.docker.network=proxy
+
+      - traefik.http.routers.nakoa-api.rule=Host(`api.${NAKOA_HOST}`)
+      - traefik.http.routers.nakoa-api.entrypoints=websecure
+      - traefik.http.routers.nakoa-api.tls=true
+      - traefik.http.routers.nakoa-api.tls.certresolver=lets
+      - traefik.http.routers.nakoa-api.service=nakoa-api-svc
+
+      - traefik.http.services.nakoa-api-svc.loadbalancer.server.port=8000
+      - traefik.http.services.nakoa-api-svc.loadbalancer.server.scheme=http
+
+      - traefik.http.routers.nakoa-api.middlewares=nakoa-sec-headers@docker,nakoa-compress@docker,nakoa-api-rl@docker
+
+      # Middlewares partagés
+      - traefik.http.middlewares.nakoa-sec-headers.headers.stsSeconds=31536000
+      - traefik.http.middlewares.nakoa-sec-headers.headers.stsIncludeSubdomains=true
+      - traefik.http.middlewares.nakoa-sec-headers.headers.stsPreload=true
+      - traefik.http.middlewares.nakoa-sec-headers.headers.contentTypeNosniff=true
+      - traefik.http.middlewares.nakoa-sec-headers.headers.frameDeny=true
+      - traefik.http.middlewares.nakoa-sec-headers.headers.referrerPolicy=strict-origin-when-cross-origin
+      - traefik.http.middlewares.nakoa-sec-headers.headers.customRequestHeaders.X-Forwarded-Proto=https
+      - traefik.http.middlewares.nakoa-compress.compress=true
+
+      # Rate limit API plus permissif (upload BAT, webhooks)
+      - traefik.http.middlewares.nakoa-api-rl.ratelimit.average=300
+      - traefik.http.middlewares.nakoa-api-rl.ratelimit.burst=500
+    cpus: "2.0"
+    mem_limit: 2048m
+    mem_reservation: 768m
+
+  # ===========================================================================
+  # WebSockets / Channels (ASGI) — daphne / uvicorn
+  # ===========================================================================
+  nakoaws:
+    <<: *django-base
+    container_name: nakoa_ws
+    hostname: nakoaws
+    command: >
+      daphne -b 0.0.0.0 -p 8001
+      --proxy-headers
+      --access-log -
+      config.asgi:application
+    environment:
+      RUN_MIGRATIONS: "0"
+      RUN_COLLECTSTATIC: "0"
+    depends_on:
+      nakoaDB:
+        condition: service_healthy
+      nakoaredis:
+        condition: service_healthy
+    networks: [nakoa_network, proxy]
+    init: true
+    security_opt:
+      - no-new-privileges:true
+    labels:
+      - traefik.enable=true
+      - traefik.docker.network=proxy
+
+      - traefik.http.routers.nakoa-ws.rule=Host(`ws.${NAKOA_HOST}`)
+      - traefik.http.routers.nakoa-ws.entrypoints=websecure
+      - traefik.http.routers.nakoa-ws.tls=true
+      - traefik.http.routers.nakoa-ws.tls.certresolver=lets
+      - traefik.http.routers.nakoa-ws.service=nakoa-ws-svc
+
+      - traefik.http.services.nakoa-ws-svc.loadbalancer.server.port=8001
+      - traefik.http.services.nakoa-ws-svc.loadbalancer.server.scheme=http
+      - traefik.http.services.nakoa-ws-svc.loadbalancer.sticky.cookie=true
+      - traefik.http.services.nakoa-ws-svc.loadbalancer.sticky.cookie.name=nakoa_ws
+      - traefik.http.services.nakoa-ws-svc.loadbalancer.sticky.cookie.httpOnly=true
+      - traefik.http.services.nakoa-ws-svc.loadbalancer.sticky.cookie.secure=true
+
+      - traefik.http.routers.nakoa-ws.middlewares=nakoa-sec-headers@docker,nakoa-compress@docker
+    cpus: "1.0"
+    mem_limit: 768m
+    mem_reservation: 256m
+
+  # ===========================================================================
+  # Celery workers
+  # ===========================================================================
+  nakoaworker:
+    <<: *django-base
+    container_name: nakoa_worker
+    hostname: nakoaworker
+    command: >
+      celery -A config worker
+      -Q default,notifications,documents,payments
+      --loglevel=warning
+      --concurrency=4
+      --prefetch-multiplier=1 -Ofair
+      --max-tasks-per-child=500
+      --without-gossip --without-mingle
+    environment:
+      CELERY_WORKER_MAX_MEMORY_PER_CHILD: "300000"   # ~300 MB
+    depends_on:
+      nakoaDB:
+        condition: service_healthy
+      nakoaredis:
+        condition: service_healthy
+    networks: [nakoa_network]
+    healthcheck:
+      test: ["CMD-SHELL", "celery -A config inspect ping -d celery@$$(hostname) >/dev/null 2>&1 || exit 1"]
+      interval: 60s
+      timeout: 10s
+      retries: 5
+    cpus: "1.5"
+    mem_limit: 1024m
+    mem_reservation: 384m
+
+  nakoaworker_ai:
+    <<: *django-base
+    container_name: nakoa_worker_ai
+    hostname: nakoaworker_ai
+    command: >
+      celery -A config worker
+      -Q ai
+      --loglevel=warning
+      --concurrency=2
+      --prefetch-multiplier=1 -Ofair
+      --max-tasks-per-child=100
+    environment:
+      CELERY_WORKER_MAX_MEMORY_PER_CHILD: "600000"   # ~600 MB (analyses BAT lourdes)
+    depends_on:
+      nakoaDB:
+        condition: service_healthy
+      nakoaredis:
+        condition: service_healthy
+    networks: [nakoa_network]
+    cpus: "2.0"
+    mem_limit: 1536m
+    mem_reservation: 512m
+
+  nakoaworker_heavy:
+    <<: *django-base
+    container_name: nakoa_worker_heavy
+    hostname: nakoaworker_heavy
+    command: >
+      celery -A config worker
+      -Q heavy
+      --loglevel=warning
+      --concurrency=2
+      --prefetch-multiplier=1 -Ofair
+      --max-tasks-per-child=200
+    depends_on:
+      nakoaDB:
+        condition: service_healthy
+      nakoaredis:
+        condition: service_healthy
+    networks: [nakoa_network]
+    cpus: "1.5"
+    mem_limit: 1024m
+    mem_reservation: 384m
+
+  # ===========================================================================
+  # Celery beat (scheduler)
+  # ===========================================================================
+  nakoabeat:
+    <<: *django-base
+    container_name: nakoa_beat
+    hostname: nakoabeat
+    command: >
+      celery -A config beat
+      --loglevel=warning
+      --scheduler django_celery_beat.schedulers:DatabaseScheduler
+      --pidfile=/tmp/celerybeat.pid
+    depends_on:
+      nakoaDB:
+        condition: service_healthy
+      nakoaredis:
+        condition: service_healthy
+    networks: [nakoa_network]
+    cpus: "0.3"
+    mem_limit: 256m
+    mem_reservation: 128m
+
+  # ===========================================================================
+  # Frontend Next.js (Nakoa marketing + dashboards web)
+  # ===========================================================================
+  nakoafront:
+    build:
+      context: ./web
+      dockerfile: Dockerfile
+      args:
+        NEXT_PUBLIC_API_URL: https://api.${NAKOA_HOST}
+        NEXT_PUBLIC_WS_URL: wss://ws.${NAKOA_HOST}
+        NEXT_PUBLIC_APP_NAME: Nakoa
+    image: nakoa/web:${VERSION:-latest}
+    container_name: nakoa_front
+    hostname: nakoafront
+    restart: unless-stopped
+    env_file: [.env.prod.web]
+    environment:
+      TZ: Africa/Abidjan
+      NODE_ENV: production
+      PORT: "3000"
+      HOSTNAME: "0.0.0.0"
+      NEXT_TELEMETRY_DISABLED: "1"
+      NEXT_PUBLIC_API_URL: https://api.${NAKOA_HOST}
+      NEXT_PUBLIC_WS_URL: wss://ws.${NAKOA_HOST}
+    networks: [nakoa_network, proxy]
+    depends_on:
+      - nakoaweb
+    init: true
+    security_opt:
+      - no-new-privileges:true
+    labels:
+      - traefik.enable=true
+      - traefik.docker.network=proxy
+
+      # Domaine principal + www -> apex
+      - traefik.http.routers.nakoa-front.rule=Host(`${NAKOA_HOST}`) || Host(`www.${NAKOA_HOST}`)
+      - traefik.http.routers.nakoa-front.entrypoints=websecure
+      - traefik.http.routers.nakoa-front.tls=true
+      - traefik.http.routers.nakoa-front.tls.certresolver=lets
+      - traefik.http.routers.nakoa-front.service=nakoa-front-svc
+
+      - traefik.http.services.nakoa-front-svc.loadbalancer.server.port=3000
+      - traefik.http.services.nakoa-front-svc.loadbalancer.server.scheme=http
+
+      # Redirige www -> apex (SEO)
+      - traefik.http.middlewares.nakoa-www-redirect.redirectregex.regex=^https?://www\.(.+)
+      - traefik.http.middlewares.nakoa-www-redirect.redirectregex.replacement=https://$$1
+      - traefik.http.middlewares.nakoa-www-redirect.redirectregex.permanent=true
+
+      - traefik.http.routers.nakoa-front.middlewares=nakoa-www-redirect@docker,nakoa-sec-headers@docker,nakoa-compress@docker,nakoa-front-rl@docker
+      - traefik.http.middlewares.nakoa-front-rl.ratelimit.average=200
+      - traefik.http.middlewares.nakoa-front-rl.ratelimit.burst=400
+    logging: *logging_rotated
+    cpus: "1.5"
+    mem_limit: 1024m
+    mem_reservation: 384m
+
+  # ===========================================================================
+  # Adminer (admin DB sécurisé par sous-domaine + basic auth recommandé)
+  # ===========================================================================
+  nakoaadminer:
+    profiles: ["admin"]
+    image: adminer
+    container_name: nakoa_adminer
+    hostname: nakoaadminer
+    restart: unless-stopped
+    environment:
+      TZ: Africa/Abidjan
+      ADMINER_DEFAULT_SERVER: nakoaDB
+      ADMINER_DESIGN: dracula
+    depends_on:
+      nakoaDB:
+        condition: service_healthy
+    networks: [nakoa_network, proxy]
+    labels:
+      - traefik.enable=true
+      - traefik.docker.network=proxy
+      - traefik.http.routers.nakoa-adminer.rule=Host(`adminer.${NAKOA_HOST}`)
+      - traefik.http.routers.nakoa-adminer.entrypoints=websecure
+      - traefik.http.routers.nakoa-adminer.tls=true
+      - traefik.http.routers.nakoa-adminer.tls.certresolver=lets
+      - traefik.http.services.nakoa-adminer.loadbalancer.server.port=8080
+      - traefik.http.services.nakoa-adminer.loadbalancer.server.scheme=http
+      # Basic Auth fortement recommandé : générer avec `htpasswd -nb admin <pwd>`
+      # puis renseigner ADMINER_BASIC_AUTH dans .env.prod (échapper les $ en $$)
+      - traefik.http.routers.nakoa-adminer.middlewares=nakoa-adminer-auth@docker,nakoa-sec-headers@docker
+      - traefik.http.middlewares.nakoa-adminer-auth.basicauth.users=${ADMINER_BASIC_AUTH:-admin:$$apr1$$change$$me}
+    logging: *logging_rotated
+    cpus: "0.3"
+    mem_limit: 256m
+    mem_reservation: 128m
+
+  # ===========================================================================
+  # Container "manage" — usage manuel pour migrations, shell, collectstatic
+  #   docker compose -f docker-compose.prod.yml run --rm nakoamanage \
+  #     python manage.py migrate
+  # ===========================================================================
+  nakoamanage:
+    <<: *django-base
+    container_name: nakoa_manage
+    hostname: nakoamanage
+    profiles: ["manage"]
+    command: ["sleep", "infinity"]
+    read_only: false
+    volumes:
+      - ./backend:/app:rw
+      - nakoa_static:/app/staticfiles:rw
+      - nakoa_media:/var/www/media:rw
+      - nakoa_logs:/app/logs:rw
+      - nakoa_dbbackups:/app/dbbackup
+    depends_on:
+      nakoaDB:
+        condition: service_healthy
+      nakoaredis:
+        condition: service_healthy
+    networks: [nakoa_network]

@@ -10,18 +10,18 @@ const inter = Inter({ subsets: ["latin"], variable: "--font-inter", display: "sw
 const sora = Sora({ subsets: ["latin"], variable: "--font-display", display: "swap" });
 
 export const metadata: Metadata = {
-  title: { default: "PrintHub — Imprimer simplement", template: "%s · PrintHub" },
+  title: { default: "Nakoa — Imprimer commence ici.", template: "%s · Nakoa" },
   description:
-    "Plateforme SaaS d'impression : marketplace intelligente, ERP de production et IA — pour l'Afrique de l'Ouest.",
+    "Nakoa — Plateforme SaaS d'impression : marketplace intelligente, ERP de production et IA — pour l'Afrique de l'Ouest.",
   keywords: ["imprimerie", "impression", "marketplace", "Côte d'Ivoire", "Mobile Money"],
-  authors: [{ name: "PrintHub" }],
+  authors: [{ name: "Nakoa" }],
   openGraph: {
     type: "website",
     locale: "fr_FR",
     url: "https://printhub.io",
-    title: "PrintHub — Imprimer simplement",
-    description: "La plateforme intelligente d'impression pour l'Afrique de l'Ouest.",
-    siteName: "PrintHub",
+    title: "Nakoa — Imprimer commence ici",
+    description: "Imprimez. Livrez. Brillez. La plateforme intelligente d'impression pour l'Afrique de l'Ouest.",
+    siteName: "Nakoa",
   },
 };
 

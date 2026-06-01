@@ -54,7 +54,7 @@ function PremiumHeader() {
           <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary text-primary-foreground">
             <Printer className="h-4 w-4" />
           </div>
-          <div className="font-display text-lg font-semibold tracking-tight">PrintHub</div>
+          <div className="font-display text-lg font-semibold tracking-tight">Nakoa</div>
         </Link>
 
         <nav className="hidden gap-1 md:flex">
@@ -106,13 +106,13 @@ function Hero() {
         >
           <div className="inline-flex items-center gap-2 rounded-full border border-border/60 bg-background/60 px-3 py-1 text-xs font-medium text-muted-foreground backdrop-blur">
             <CircleDot className="h-3 w-3 text-primary" />
-            Marketplace d&apos;impression nouvelle génération
+            Nakoa — Imprimer commence ici
           </div>
 
           <h1 className="font-display text-5xl font-bold leading-[1.05] tracking-tight md:text-7xl text-balance">
-            Tous vos besoins d&apos;impression{" "}
+            Imprimez.{" "}
             <span className="relative inline-block">
-              en quelques clics
+              Livrez. Brillez.
               <motion.span
                 initial={{ scaleX: 0 }}
                 animate={{ scaleX: 1 }}
@@ -120,12 +120,11 @@ function Hero() {
                 className="absolute -bottom-1 left-0 h-1 w-full origin-left rounded-full bg-primary"
               />
             </span>
-            .
           </h1>
 
           <p className="max-w-xl text-lg text-muted-foreground md:text-xl text-balance">
-            Comparez les meilleurs imprimeurs, obtenez des devis instantanés,
-            commandez et suivez votre production en temps réel.
+            Nakoa connecte vos besoins d&apos;impression aux meilleurs ateliers d&apos;Afrique de l&apos;Ouest.
+            Devis instantanés, paiement Mobile Money, livraison tracée — l&apos;impression commence ici.
           </p>
 
           <div className="flex flex-col gap-3 pt-2 sm:flex-row">
@@ -209,7 +208,7 @@ function Products() {
       <SectionTitle
         chip="Catalogue"
         title="Plus de 15 catégories d'impression"
-        subtitle="Du simple flyer aux campagnes XXL — tout est imprimable sur PrintHub avec qualité professionnelle garantie."
+        subtitle="Du simple flyer aux campagnes XXL — tout est imprimable sur Nakoa avec qualité professionnelle garantie."
       />
 
       <div className="mt-12 grid gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
@@ -263,7 +262,7 @@ function HowItWorks() {
     { n: "01", icon: Wand2, title: "Décrivez votre besoin", desc: "Catalogue interactif ou assistant IA conversationnel — choisissez le mode qui vous convient." },
     { n: "02", icon: Sparkles, title: "Recevez plusieurs offres", desc: "Notre moteur de matching IA propose les meilleurs imprimeurs en moins de 10 secondes." },
     { n: "03", icon: MousePointerClick, title: "Choisissez votre imprimeur", desc: "Comparez prix, délais, qualité, distance. Payez en Mobile Money sécurisé." },
-    { n: "04", icon: Truck, title: "Recevez votre commande", desc: "Suivi production temps réel, livraison tracée et garantie qualité PrintHub Care." },
+    { n: "04", icon: Truck, title: "Recevez votre commande", desc: "Suivi production temps réel, livraison tracée et garantie qualité Nakoa Care." },
   ];
 
   return (
@@ -271,7 +270,7 @@ function HowItWorks() {
       <SectionTitle
         chip="Méthode"
         title="Commander n'a jamais été aussi simple"
-        subtitle="De l'idée à la livraison, PrintHub orchestre tout pour vous."
+        subtitle="De l'idée à la livraison, Nakoa orchestre tout pour vous."
       />
 
       <div className="mt-16 grid gap-6 md:grid-cols-2 lg:grid-cols-4">
@@ -327,7 +326,7 @@ function AISection() {
         <div className="text-center">
           <div className="inline-flex items-center gap-2 rounded-full border border-background/20 bg-background/5 px-3 py-1 text-xs font-medium text-background/70 backdrop-blur">
             <Cpu className="h-3 w-3" />
-            PrintHub AI
+            Nakoa AI
           </div>
           <h2 className="mt-4 font-display text-4xl font-bold tracking-tight md:text-6xl text-balance">
             L&apos;intelligence artificielle au service de vos impressions
@@ -383,7 +382,7 @@ function PrintersShowcase() {
       <SectionTitle
         chip="Réseau"
         title="Des imprimeurs d'élite vérifiés"
-        subtitle="500+ ateliers partenaires audités, notés et certifiés par PrintHub."
+        subtitle="500+ ateliers partenaires audités, notés et certifiés par Nakoa."
       />
 
       <div className="mt-12 grid gap-4 md:grid-cols-2 lg:grid-cols-4">
@@ -536,13 +535,13 @@ function Pricing() {
       price: "Gratuit",
       period: "",
       commission: "15 %",
-      tagline: "Démarrez sur PrintHub sans engagement.",
+      tagline: "Démarrez sur Nakoa sans engagement.",
       features: [
         "10 commandes actives",
         "2 utilisateurs",
         "20 produits configurés",
         "Support par email",
-        "Garantie PrintHub Care 48 h",
+        "Garantie Nakoa Care 48 h",
       ],
       cta: "Commencer gratuitement",
       featured: false,
@@ -673,7 +672,7 @@ function Pricing() {
 // ============================================================
 function Testimonials() {
   const reviews = [
-    { name: "Aïssata D.", role: "Directrice marketing — Agence Brand'O", text: "PrintHub a divisé par 3 le temps que nous passions à comparer des imprimeurs. Aujourd'hui, on commande en 5 minutes." },
+    { name: "Aïssata D.", role: "Directrice marketing — Agence Brand'O", text: "Nakoa a divisé par 3 le temps que nous passions à comparer des imprimeurs. Aujourd'hui, on commande en 5 minutes." },
     { name: "Moussa K.", role: "CEO — Festival Abidjan Vibes", text: "Pour notre festival, 2000 affiches et 50 bâches imprimées en 48h. Qualité irréprochable, livraison express." },
     { name: "Fatima B.", role: "Communication — ONG UEMOA", text: "Mobile Money + escrow nous rassurent. Et le suivi temps réel change tout pour la planification." },
   ];
@@ -816,11 +815,11 @@ function FAQ() {
   const [open, setOpen] = useState<number | null>(0);
   const items = [
     { q: "Comment passer ma première commande ?", a: "Inscrivez-vous gratuitement, choisissez un produit dans le catalogue, configurez les options, recevez des offres en 10 secondes, choisissez, payez en Mobile Money." },
-    { q: "Quels sont les délais de livraison ?", a: "De 24h (mode Express) à 7 jours selon le produit et la quantité. Chaque offre affiche son délai garanti — et si l'imprimeur dépasse, vous êtes remboursé via PrintHub Care." },
+    { q: "Quels sont les délais de livraison ?", a: "De 24h (mode Express) à 7 jours selon le produit et la quantité. Chaque offre affiche son délai garanti — et si l'imprimeur dépasse, vous êtes remboursé via Nakoa Care." },
     { q: "Comment envoyer mon BAT (Bon À Tirer) ?", a: "Téléversez votre PDF/AI/PSD directement depuis le configurateur. Notre IA analyse instantanément la résolution, les marges, les fonds perdus." },
     { q: "Puis-je comparer plusieurs imprimeurs ?", a: "Oui. Vous recevez automatiquement les 5 meilleures offres, classées par prix, délai, qualité, distance. À vous de choisir." },
     { q: "Quels moyens de paiement acceptez-vous ?", a: "Wave, Orange Money, MTN MoMo, Moov Money, CinetPay (cartes), Stripe pour l'international. Toutes les transactions sont sécurisées avec escrow." },
-    { q: "Que se passe-t-il si le produit n'est pas conforme ?", a: "La garantie PrintHub Care couvre vos commandes 48h après livraison. Si le rendu ne correspond pas au BAT validé, nous remboursons ou réimprimons gratuitement." },
+    { q: "Que se passe-t-il si le produit n'est pas conforme ?", a: "La garantie Nakoa Care couvre vos commandes 48h après livraison. Si le rendu ne correspond pas au BAT validé, nous remboursons ou réimprimons gratuitement." },
   ];
   return (
     <section className="container py-24">
@@ -879,7 +878,7 @@ function PremiumFooter() {
               <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-background text-foreground">
                 <Printer className="h-4 w-4" strokeWidth={1.5} />
               </div>
-              <span className="font-display text-lg font-semibold">PrintHub</span>
+              <span className="font-display text-lg font-semibold">Nakoa</span>
             </Link>
             <p className="mt-4 max-w-xs text-sm text-background/60">
               La marketplace d&apos;impression nouvelle génération pour l&apos;Afrique de l&apos;Ouest.
@@ -890,7 +889,7 @@ function PremiumFooter() {
             </div>
             <div className="mt-2 flex items-center gap-3 text-sm text-background/60">
               <Mail className="h-4 w-4" strokeWidth={1.5} />
-              <span>hello@printhub.io</span>
+              <span>hello@nakoa.io</span>
             </div>
           </div>
           {[
@@ -911,7 +910,7 @@ function PremiumFooter() {
           ))}
         </div>
         <div className="mt-16 flex flex-col items-center justify-between gap-4 border-t border-background/10 pt-6 text-xs text-background/50 md:flex-row">
-          <p>© {new Date().getFullYear()} PrintHub. Tous droits réservés.</p>
+          <p>© {new Date().getFullYear()} Nakoa. Tous droits réservés.</p>
           <div className="flex gap-4">
             <Link href="/legal/cgu" className="hover:text-background">CGU</Link>
             <Link href="/legal/cgv" className="hover:text-background">CGV</Link>

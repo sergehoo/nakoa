@@ -16,7 +16,7 @@ export function SiteHeader() {
           <div className="flex h-9 w-9 items-center justify-center rounded-lg gradient-brand text-white">
             <Printer className="h-5 w-5" />
           </div>
-          <span className="font-display text-lg font-bold tracking-tight">PrintHub</span>
+          <span className="font-display text-lg font-bold tracking-tight">Nakoa</span>
         </Link>
 
         <nav className="hidden gap-8 md:flex">

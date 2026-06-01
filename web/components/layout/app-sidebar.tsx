@@ -47,7 +47,7 @@ export function AppSidebar({ role }: { role: SidebarRole }) {
         <div className="flex h-8 w-8 items-center justify-center rounded-lg gradient-brand text-white">
           <Printer className="h-4 w-4" />
         </div>
-        <span className="font-display text-base font-bold">PrintHub</span>
+        <span className="font-display text-base font-bold">Nakoa</span>
       </div>
 
       <nav className="flex-1 space-y-1 p-3">

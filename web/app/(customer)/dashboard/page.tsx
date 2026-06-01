@@ -18,7 +18,7 @@ export default function CustomerDashboard() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="font-display text-3xl font-bold tracking-tight">Bonjour 👋</h1>
-          <p className="text-sm text-muted-foreground">Voici un aperçu de votre activité PrintHub.</p>
+          <p className="text-sm text-muted-foreground">Voici un aperçu de votre activité Nakoa.</p>
         </div>
         <Button asChild>
           <Link href="/catalog">
