@@ -3,7 +3,11 @@ FROM node:20-alpine AS deps
 WORKDIR /app
 RUN apk add --no-cache libc6-compat
 COPY package.json package-lock.json* ./
-RUN npm ci --prefer-offline --no-audit
+# Try reproducible install first; fall back to npm install if the lockfile drifted.
+# This unblocks the build when a dep was added but the lockfile was not regenerated.
+RUN npm ci --prefer-offline --no-audit --no-fund \
+    || (echo ">>> Lockfile drifted, regenerating via 'npm install'" \
+        && npm install --prefer-offline --no-audit --no-fund)
 
 # ===== builder =====
 FROM node:20-alpine AS builder
