@@ -1,0 +1,49 @@
+# Dépendances installées localement (réinstallées via npm ci)
+node_modules
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Build outputs
+.next
+out
+build
+dist
+
+# Tests E2E (Playwright) — ne doivent pas être dans l'image runtime
+playwright.config.ts
+playwright-report
+test-results
+tests
+
+# Linting / formatting / typing caches
+.eslintcache
+*.tsbuildinfo
+
+# IDE / OS
+.vscode
+.idea
+.DS_Store
+Thumbs.db
+
+# Env locaux (les valeurs prod sont injectées par compose)
+.env
+.env.local
+.env.development
+.env.development.local
+.env.test
+.env.test.local
+
+# Git
+.git
+.gitignore
+.github
+
+# Documentation
+README.md
+*.md
+
+# Docker
+Dockerfile
+.dockerignore
+docker-compose*.yml
