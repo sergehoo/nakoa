@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { Suspense, useState } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useForm } from "react-hook-form";
@@ -25,7 +25,7 @@ const schema = z.object({
 
 type FormData = z.infer<typeof schema>;
 
-export default function RegisterPage() {
+function RegisterForm() {
   const router = useRouter();
   const search = useSearchParams();
   const role = (search.get("role") as "customer" | "printer" | "courier") ?? "customer";
@@ -53,8 +53,9 @@ export default function RegisterPage() {
         description: "Un code de vérification a été envoyé à votre email.",
       });
       router.push(`/otp?identifier=${encodeURIComponent(data.email)}&purpose=email_verify`);
-    } catch (e: any) {
-      const detail = e.response?.data?.detail;
+    } catch (e: unknown) {
+      const err = e as { response?: { data?: { detail?: string } } };
+      const detail = err?.response?.data?.detail;
       toast.error("Inscription échouée", { description: typeof detail === "string" ? detail : "Réessayez." });
     }
   };
@@ -126,5 +127,21 @@ export default function RegisterPage() {
         </p>
       </form>
     </div>
+  );
+}
+
+function RegisterFallback() {
+  return (
+    <div className="flex items-center justify-center py-20">
+      <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+    </div>
+  );
+}
+
+export default function RegisterPage() {
+  return (
+    <Suspense fallback={<RegisterFallback />}>
+      <RegisterForm />
+    </Suspense>
   );
 }
