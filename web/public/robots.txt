@@ -1,0 +1,8 @@
+User-agent: *
+Allow: /
+
+# Crawl delay raisonnable pour éviter le scraping abusif
+Crawl-delay: 5
+
+# Sitemap dynamique généré par Next.js
+Sitemap: https://nakoahub.com/sitemap.xml
