@@ -21,7 +21,10 @@ class Organization(BaseModel):
     slug = models.SlugField(max_length=180, unique=True)
     country = models.CharField(max_length=8, choices=Country.choices, default=Country.CI)
     members = models.ManyToManyField(
-        settings.AUTH_USER_MODEL, through="OrganizationMember", related_name="organizations",
+        settings.AUTH_USER_MODEL,
+        through="OrganizationMember",
+        through_fields=("organization", "user"),
+        related_name="organizations",
     )
     metadata = models.JSONField(default=dict, blank=True)
 

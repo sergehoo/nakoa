@@ -56,7 +56,10 @@ class CustomerCompany(BaseModel):
     country = models.CharField(max_length=8, choices=Country.choices, default=Country.CI)
     billing_email = models.EmailField(blank=True)
     members = models.ManyToManyField(
-        settings.AUTH_USER_MODEL, through="CustomerCompanyMember", related_name="customer_companies",
+        settings.AUTH_USER_MODEL,
+        through="CustomerCompanyMember",
+        through_fields=("company", "user"),
+        related_name="customer_companies",
     )
     credit_limit = models.DecimalField(max_digits=15, decimal_places=2, default=Decimal("0"))
     payment_terms_days = models.PositiveIntegerField(default=0)

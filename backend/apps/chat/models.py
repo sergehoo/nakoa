@@ -26,7 +26,10 @@ class Conversation(BaseModel):
         on_delete=models.SET_NULL, related_name="conversations",
     )
     participants = models.ManyToManyField(
-        settings.AUTH_USER_MODEL, through="ConversationMember", related_name="conversations",
+        settings.AUTH_USER_MODEL,
+        through="ConversationMember",
+        through_fields=("conversation", "user"),
+        related_name="conversations",
     )
     last_message_at = models.DateTimeField(null=True, blank=True)
     is_archived = models.BooleanField(default=False)
