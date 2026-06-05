@@ -94,6 +94,7 @@ const NAV: Record<SidebarRole, NavSection[]> = {
     {
       title: "Marketplace",
       items: [
+        { href: "/a/catalog", label: "Catalogue Nakoa", icon: Boxes },
         { href: "/a/printers", label: "Imprimeurs", icon: Printer },
         { href: "/a/users", label: "Utilisateurs", icon: Users },
         { href: "/a/kyc", label: "Validation KYC", icon: ShieldCheck },

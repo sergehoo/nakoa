@@ -178,6 +178,12 @@ export const endpoints = {
     userDetail: (id: string) => `/accounts/admin/users/${id}/`,
     userSuspend: (id: string) => `/accounts/admin/users/${id}/suspend/`,
     userActivate: (id: string) => `/accounts/admin/users/${id}/activate/`,
+    catalogCategories: "/catalog/admin/categories/",
+    catalogCategoryDetail: (id: string) => `/catalog/admin/categories/${id}/`,
+    catalogProducts: "/catalog/admin/products/",
+    catalogProductDetail: (id: string) => `/catalog/admin/products/${id}/`,
+    catalogProductsStats: "/catalog/admin/products/stats/",
+    catalogProductsImportCsv: "/catalog/admin/products/import-csv/",
   },
 };
 
