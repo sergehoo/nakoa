@@ -86,6 +86,27 @@ export function useMe(enabled = true) {
   });
 }
 
+export function useUpdateMe() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (payload: Partial<{
+      first_name: string;
+      last_name: string;
+      phone: string;
+      locale: string;
+      timezone: string;
+      country: string;
+      preferred_currency: string;
+    }>) => {
+      const { data } = await api.patch<User>(endpoints.me, payload);
+      return data;
+    },
+    onSuccess: (data) => {
+      qc.setQueryData(["me"], data);
+    },
+  });
+}
+
 export function useSetup2FA() {
   return useMutation({
     mutationFn: async () => {

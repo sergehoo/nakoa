@@ -1,12 +1,12 @@
 "use client";
 
 import { useParams } from "next/navigation";
-import { Check, Circle, Clock, Loader2, Package, Truck } from "lucide-react";
+import { Check, Circle } from "lucide-react";
 import { useOrder } from "@/hooks/use-orders";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { OrderStatusBadge } from "@/components/domain/order-status-badge";
+import { BatUploader } from "@/components/domain/bat-uploader";
 import { formatCurrency, formatDateTime } from "@/lib/utils";
 import { cn } from "@/lib/utils";
 import { useWebSocket } from "@/hooks/use-websocket";
@@ -116,6 +116,23 @@ export default function OrderDetailPage() {
           <p>{order.delivery_address.city}, {order.delivery_address.country}</p>
         </CardContent>
       </Card>
+
+      {/* BAT uploader visible tant que la commande n'est pas en production */}
+      {["paid", "accepted", "files_received"].includes(order.status) && (
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-base">Bon À Tirer (BAT)</CardTitle>
+            <p className="text-xs text-muted-foreground">
+              Téléversez votre fichier d&apos;impression (PDF, PSD, AI, TIFF — jusqu&apos;à 100 Mo).
+              Notre IA analyse automatiquement la qualité et vous indique d&apos;éventuels problèmes
+              avant le lancement de la production.
+            </p>
+          </CardHeader>
+          <CardContent>
+            <BatUploader orderId={order.id} />
+          </CardContent>
+        </Card>
+      )}
     </div>
   );
 }

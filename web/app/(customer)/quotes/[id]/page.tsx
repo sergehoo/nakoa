@@ -41,8 +41,8 @@ export default function QuoteDetailPage() {
       return data;
     },
     onSuccess: (data) => {
-      toast.success("Commande créée");
-      router.push(`/orders/${data.order_id}`);
+      toast.success("Commande créée, redirection vers le paiement…");
+      router.push(`/orders/${data.order_id}/checkout`);
     },
     onError: () => toast.error("Impossible de créer la commande"),
   });

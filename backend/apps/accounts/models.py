@@ -204,3 +204,38 @@ class UserDevice(BaseModel):
         constraints = [
             models.UniqueConstraint(fields=["user", "fcm_token"], name="uq_user_fcm"),
         ]
+
+
+class PaymentMethod(BaseModel):
+    """Moyens de paiement enregistrés (Mobile Money + CB tokenisée)."""
+
+    class Kind(models.TextChoices):
+        WAVE = "wave", "Wave"
+        ORANGE_MONEY = "orange_money", "Orange Money"
+        MTN_MOMO = "mtn_momo", "MTN MoMo"
+        MOOV = "moov", "Moov Money"
+        CARD_STRIPE = "card_stripe", _("Carte (Stripe)")
+        BANK_TRANSFER = "bank_transfer", _("Virement bancaire")
+
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="payment_methods")
+    kind = models.CharField(max_length=20, choices=Kind.choices)
+    label = models.CharField(max_length=80, blank=True)
+    phone_number = PhoneNumberField(blank=True, null=True)
+    # Pour CB (jamais le PAN, juste le token + meta)
+    stripe_payment_method_id = models.CharField(max_length=64, blank=True)
+    card_brand = models.CharField(max_length=20, blank=True)
+    card_last4 = models.CharField(max_length=4, blank=True)
+    # Virement bancaire (numéro masqué côté affichage)
+    masked_account = models.CharField(max_length=64, blank=True)
+    is_default = models.BooleanField(default=False)
+
+    class Meta:
+        ordering = ["-is_default", "-created_at"]
+        indexes = [models.Index(fields=["user", "kind", "is_default"])]
+        constraints = [
+            models.UniqueConstraint(
+                fields=["user", "kind", "phone_number"],
+                name="uq_user_kind_phone",
+                condition=models.Q(phone_number__isnull=False),
+            ),
+        ]

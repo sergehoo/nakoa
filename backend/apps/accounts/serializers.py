@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from .models import User, UserAddress, UserDevice, UserPreferences
+from .models import PaymentMethod, User, UserAddress, UserDevice, UserPreferences
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -38,3 +38,21 @@ class UserDeviceSerializer(serializers.ModelSerializer):
         model = UserDevice
         fields = ["id", "platform", "fcm_token", "name", "last_seen_at", "created_at"]
         read_only_fields = ["id", "created_at"]
+
+
+class PaymentMethodSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = PaymentMethod
+        fields = [
+            "id", "kind", "label", "phone_number",
+            "card_brand", "card_last4", "masked_account",
+            "is_default", "created_at",
+        ]
+        read_only_fields = [
+            "id", "card_brand", "card_last4", "masked_account", "created_at",
+        ]
+        extra_kwargs = {
+            # On accepte le numéro en string lors de la création (formats variés)
+            "phone_number": {"required": False, "allow_null": True, "allow_blank": True},
+            "label": {"required": False, "allow_blank": True},
+        }
