@@ -189,10 +189,11 @@ interface KpiCardPremiumProps {
 }
 
 const ACCENT_GRADIENTS: Record<NonNullable<KpiCardPremiumProps["accent"]>, string> = {
-  indigo: "from-indigo-500/20 to-violet-500/5 text-indigo-400",
+  // "indigo" est conservé comme nom de prop mais mappé sur l'orange chaud (couleur primaire Nakoa)
+  indigo: "from-orange-500/25 to-amber-500/5 text-orange-400",
+  amber: "from-amber-500/25 to-yellow-500/5 text-amber-400",
+  pink: "from-rose-500/25 to-orange-500/5 text-rose-400",
   cyan: "from-cyan-500/20 to-sky-500/5 text-cyan-400",
-  pink: "from-fuchsia-500/20 to-pink-500/5 text-fuchsia-400",
-  amber: "from-amber-500/20 to-orange-500/5 text-amber-400",
   emerald: "from-emerald-500/20 to-green-500/5 text-emerald-400",
 };
 

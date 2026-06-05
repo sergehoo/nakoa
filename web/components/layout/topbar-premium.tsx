@@ -64,7 +64,7 @@ export function TopbarPremium() {
         {/* Quick action contextuelle selon rôle */}
         <Button
           size="sm"
-          className="hidden gap-2 bg-gradient-to-br from-indigo-500 via-violet-500 to-fuchsia-500 text-white shadow-lg shadow-indigo-500/20 transition-transform hover:scale-105 lg:flex"
+          className="hidden gap-2 bg-gradient-to-br from-orange-500 via-amber-500 to-rose-500 text-white shadow-lg shadow-orange-500/30 transition-transform hover:scale-105 lg:flex"
           asChild
         >
           <Link href={user?.primary_role?.startsWith("printer") ? "/p/orders" : "/catalog"}>
@@ -75,7 +75,7 @@ export function TopbarPremium() {
 
         {/* AI Assistant trigger */}
         <Button variant="ghost" size="icon" className="relative" title="Assistant Nakoa AI">
-          <Sparkles className="h-4 w-4 text-primary" />
+          <Sparkles className="h-4 w-4 text-orange-400" />
         </Button>
 
         <ThemeToggle />
@@ -86,9 +86,9 @@ export function TopbarPremium() {
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="ghost" className="h-9 gap-2 px-1.5 md:px-2">
-              <Avatar className="h-7 w-7 ring-2 ring-primary/20">
+              <Avatar className="h-7 w-7 ring-2 ring-orange-500/30">
                 <AvatarImage src="" />
-                <AvatarFallback className="bg-gradient-to-br from-indigo-500 to-fuchsia-500 text-xs text-white">
+                <AvatarFallback className="bg-gradient-to-br from-orange-500 to-rose-500 text-xs text-white">
                   {initials(user?.full_name ?? user?.email ?? "U")}
                 </AvatarFallback>
               </Avatar>
@@ -105,7 +105,7 @@ export function TopbarPremium() {
           <DropdownMenuContent align="end" className="w-64" sideOffset={8}>
             <div className="flex items-center gap-3 p-3">
               <Avatar className="h-10 w-10">
-                <AvatarFallback className="bg-gradient-to-br from-indigo-500 to-fuchsia-500 text-white">
+                <AvatarFallback className="bg-gradient-to-br from-orange-500 to-rose-500 text-white">
                   {initials(user?.full_name ?? user?.email ?? "U")}
                 </AvatarFallback>
               </Avatar>

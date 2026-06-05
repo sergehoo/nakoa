@@ -142,7 +142,7 @@ export default function CustomerDashboard() {
                     href={`/orders/${o.id}`}
                     className="flex items-center gap-4 px-6 py-4 transition-colors hover:bg-secondary/40"
                   >
-                    <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-gradient-to-br from-indigo-500/20 to-fuchsia-500/10 text-indigo-400">
+                    <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-gradient-to-br from-orange-500/25 to-amber-500/10 text-orange-400">
                       <Package className="h-4 w-4" />
                     </div>
                     <div className="min-w-0 flex-1">
@@ -161,8 +161,8 @@ export default function CustomerDashboard() {
             </ul>
           ) : (
             <div className="flex flex-col items-center gap-3 py-12 text-center">
-              <div className="flex h-12 w-12 items-center justify-center rounded-full bg-gradient-to-br from-indigo-500/20 to-fuchsia-500/10">
-                <Sparkles className="h-5 w-5 text-indigo-400" />
+              <div className="flex h-12 w-12 items-center justify-center rounded-full bg-gradient-to-br from-orange-500/25 to-amber-500/10">
+                <Sparkles className="h-5 w-5 text-orange-400" />
               </div>
               <div className="space-y-1">
                 <p className="font-semibold">Première commande à portée de clic</p>

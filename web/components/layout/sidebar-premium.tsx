@@ -236,7 +236,7 @@ export function SidebarPremium({ role }: { role: SidebarRole }) {
     <aside className="hidden h-screen w-64 shrink-0 flex-col border-r bg-card md:sticky md:top-0 md:flex">
       {/* Brand */}
       <div className="flex h-16 items-center gap-3 border-b px-4">
-        <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-indigo-500 via-violet-500 to-fuchsia-500 text-white shadow-lg shadow-indigo-500/30">
+        <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-orange-500 via-amber-500 to-rose-500 text-white shadow-lg shadow-orange-500/30">
           <Zap className="h-4 w-4" />
         </div>
         <div className="flex flex-col">

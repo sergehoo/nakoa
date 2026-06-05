@@ -32,7 +32,7 @@ const ROLES = [
   { code: "owner", label: "Propriétaire", icon: Crown, color: "bg-amber-500", description: "Accès complet, y compris facturation et suppression du compte." },
   { code: "manager", label: "Manager", icon: ShieldCheck, color: "bg-blue-500", description: "Gère commandes, équipe, catalogue et grilles tarifaires." },
   { code: "operator", label: "Opérateur", icon: Wrench, color: "bg-emerald-500", description: "Travaille sur les commandes : production, statuts." },
-  { code: "accountant", label: "Comptable", icon: ShieldCheck, color: "bg-purple-500", description: "Accès factures, paiements et retraits uniquement." },
+  { code: "accountant", label: "Comptable", icon: ShieldCheck, color: "bg-rose-500", description: "Accès factures, paiements et retraits uniquement." },
   { code: "viewer", label: "Observateur", icon: Eye, color: "bg-slate-500", description: "Lecture seule sur dashboards et commandes." },
 ] as const;
 

@@ -164,7 +164,7 @@ export default function AdminDashboard() {
         <Card className="surface-premium">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              <Activity className="h-4 w-4 text-indigo-400" /> Répartition statuts
+              <Activity className="h-4 w-4 text-orange-400" /> Répartition statuts
             </CardTitle>
             <p className="text-xs text-muted-foreground">Commandes en cours</p>
           </CardHeader>
@@ -208,9 +208,9 @@ export default function AdminDashboard() {
       </div>
 
       {/* Encart NAKOA AI */}
-      <Card className="surface-premium border-primary/30 bg-gradient-to-br from-primary/5 via-transparent to-fuchsia-500/5">
+      <Card className="surface-premium border-orange-500/30 bg-gradient-to-br from-orange-500/5 via-transparent to-rose-500/5">
         <CardContent className="flex flex-col gap-4 p-6 md:flex-row md:items-center">
-          <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-indigo-500 via-violet-500 to-fuchsia-500 text-white shadow-lg shadow-indigo-500/30">
+          <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-orange-500 via-amber-500 to-rose-500 text-white shadow-lg shadow-orange-500/30">
             <Sparkles className="h-6 w-6" />
           </div>
           <div className="flex-1">
