@@ -59,26 +59,43 @@ export const SelectContent = React.forwardRef<
 ));
 SelectContent.displayName = SelectPrimitive.Content.displayName;
 
+/**
+ * Wrapper défensif : Radix UI plante si value est une chaîne vide (ou undefined/null).
+ * En production, ces cas peuvent arriver si l'API renvoie des slugs vides ou des
+ * options dynamiques pas encore filtrées. On substitue un placeholder unique pour
+ * éviter le crash. La donnée vide n'aura jamais d'usage utile en sélection.
+ */
+const EMPTY_VALUE_FALLBACK = "__empty__";
+
 export const SelectItem = React.forwardRef<
   React.ElementRef<typeof SelectPrimitive.Item>,
   React.ComponentPropsWithoutRef<typeof SelectPrimitive.Item>
->(({ className, children, ...props }, ref) => (
-  <SelectPrimitive.Item
-    ref={ref}
-    className={cn(
-      "relative flex w-full cursor-default select-none items-center rounded-md py-1.5 pl-8 pr-2 text-sm outline-none",
-      "focus:bg-accent/10 focus:text-foreground",
-      "data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
-      className,
-    )}
-    {...props}
-  >
-    <span className="absolute left-2 flex h-3.5 w-3.5 items-center justify-center">
-      <SelectPrimitive.ItemIndicator>
-        <Check className="h-4 w-4" />
-      </SelectPrimitive.ItemIndicator>
-    </span>
-    <SelectPrimitive.ItemText>{children}</SelectPrimitive.ItemText>
-  </SelectPrimitive.Item>
-));
+>(({ className, children, value, ...props }, ref) => {
+  // Sécurise la valeur : Radix exige une string non-vide.
+  const safeValue =
+    typeof value === "string" && value.length > 0
+      ? value
+      : EMPTY_VALUE_FALLBACK;
+
+  return (
+    <SelectPrimitive.Item
+      ref={ref}
+      value={safeValue}
+      className={cn(
+        "relative flex w-full cursor-default select-none items-center rounded-md py-1.5 pl-8 pr-2 text-sm outline-none",
+        "focus:bg-accent/10 focus:text-foreground",
+        "data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
+        className,
+      )}
+      {...props}
+    >
+      <span className="absolute left-2 flex h-3.5 w-3.5 items-center justify-center">
+        <SelectPrimitive.ItemIndicator>
+          <Check className="h-4 w-4" />
+        </SelectPrimitive.ItemIndicator>
+      </span>
+      <SelectPrimitive.ItemText>{children}</SelectPrimitive.ItemText>
+    </SelectPrimitive.Item>
+  );
+});
 SelectItem.displayName = SelectPrimitive.Item.displayName;
