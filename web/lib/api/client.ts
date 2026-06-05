@@ -159,7 +159,19 @@ export const endpoints = {
   },
   kyc: {
     submissions: "/kyc/submissions/",
+    submissionDetail: (id: string) => `/kyc/submissions/${id}/`,
     submit: (id: string) => `/kyc/submissions/${id}/submit/`,
+    approve: (id: string) => `/kyc/submissions/${id}/approve/`,
+    reject: (id: string) => `/kyc/submissions/${id}/reject/`,
+    needsInfo: (id: string) => `/kyc/submissions/${id}/needs-info/`,
+    documents: "/kyc/documents/",
+    documentDetail: (id: string) => `/kyc/documents/${id}/`,
+  },
+  admin: {
+    users: "/accounts/admin/users/",
+    userDetail: (id: string) => `/accounts/admin/users/${id}/`,
+    userSuspend: (id: string) => `/accounts/admin/users/${id}/suspend/`,
+    userActivate: (id: string) => `/accounts/admin/users/${id}/activate/`,
   },
 };
 

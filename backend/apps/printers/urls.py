@@ -1,6 +1,7 @@
 from django.urls import path
 from rest_framework.routers import DefaultRouter
 
+from .members_viewset import PrinterMemberViewSet
 from .views_marketplace import by_badge, printer_marketplace_rank, top_ranking
 from .views_score import my_printer_score, printer_score_public
 from .viewsets import (
@@ -21,6 +22,7 @@ router.register("finishes", FinishViewSet, basename="finish")
 router.register("delivery-zones", DeliveryZoneViewSet, basename="delivery-zone")
 router.register("capabilities", CapabilityViewSet, basename="capability")
 router.register("agents", PrinterAgentViewSet, basename="agent")
+router.register("members", PrinterMemberViewSet, basename="member")
 
 urlpatterns = [
     # PrintHub Score
