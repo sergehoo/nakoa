@@ -14,7 +14,13 @@ export function useCategories() {
   });
 }
 
-export function useProducts(filters?: { category?: string; search?: string; page?: number }) {
+export function useProducts(filters?: {
+  category?: string;
+  search?: string;
+  page?: number;
+  page_size?: number;
+  ordering?: string;
+}) {
   return useQuery<Paginated<Product>>({
     queryKey: ["products", filters],
     queryFn: async () => {
