@@ -15,6 +15,23 @@ WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 ENV NEXT_TELEMETRY_DISABLED=1
+
+# Build-time public env vars (passées depuis docker-compose.prod.yml via build args).
+# Les variables NEXT_PUBLIC_* doivent être présentes pendant `next build` car elles
+# sont *inlinées dans le bundle JavaScript client* à la compilation.
+ARG NEXT_PUBLIC_API_URL=http://localhost:8000
+ARG NEXT_PUBLIC_WS_URL=ws://localhost:8001
+ARG NEXT_PUBLIC_APP_NAME=Nakoa
+ARG NEXT_PUBLIC_APP_URL=https://nakoahub.com
+ARG NEXT_PUBLIC_DEFAULT_LOCALE=fr
+ARG NEXT_PUBLIC_SUPPORTED_LOCALES=fr,en
+ENV NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL
+ENV NEXT_PUBLIC_WS_URL=$NEXT_PUBLIC_WS_URL
+ENV NEXT_PUBLIC_APP_NAME=$NEXT_PUBLIC_APP_NAME
+ENV NEXT_PUBLIC_APP_URL=$NEXT_PUBLIC_APP_URL
+ENV NEXT_PUBLIC_DEFAULT_LOCALE=$NEXT_PUBLIC_DEFAULT_LOCALE
+ENV NEXT_PUBLIC_SUPPORTED_LOCALES=$NEXT_PUBLIC_SUPPORTED_LOCALES
+
 RUN npm run build
 
 # ===== runner =====

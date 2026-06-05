@@ -413,10 +413,15 @@ services:
     build:
       context: ./web
       dockerfile: Dockerfile
+      # Les variables NEXT_PUBLIC_* DOIVENT être passées en build args :
+      # Next.js les inline dans le bundle client à la compilation, pas au runtime.
       args:
         NEXT_PUBLIC_API_URL: https://api.${NAKOA_HOST}
         NEXT_PUBLIC_WS_URL: wss://ws.${NAKOA_HOST}
         NEXT_PUBLIC_APP_NAME: Nakoa
+        NEXT_PUBLIC_APP_URL: https://${NAKOA_HOST}
+        NEXT_PUBLIC_DEFAULT_LOCALE: fr
+        NEXT_PUBLIC_SUPPORTED_LOCALES: fr,en
     image: nakoa/web:${VERSION:-latest}
     container_name: nakoa_front
     hostname: nakoafront
