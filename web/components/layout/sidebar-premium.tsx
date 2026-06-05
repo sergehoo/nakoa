@@ -65,6 +65,7 @@ const NAV: Record<SidebarRole, NavSection[]> = {
       items: [
         { href: "/p/orders", label: "Commandes", icon: ShoppingCart },
         { href: "/p/production", label: "Atelier", icon: ClipboardList },
+        { href: "/p/opportunities", label: "Opportunités", icon: Sparkles, beta: true },
       ],
     },
     {

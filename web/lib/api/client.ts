@@ -93,6 +93,10 @@ export const endpoints = {
     submit: (id: string) => `/quote-requests/${id}/submit/`,
     selectOffer: (id: string) => `/quote-requests/${id}/select-offer/`,
     convert: (id: string) => `/quote-requests/${id}/convert/`,
+    // Opportunités imprimeur
+    opportunities: "/quote-requests/opportunities/",
+    opportunityRespond: (id: string) => `/quote-requests/opportunities/${id}/respond/`,
+    opportunityDecline: (id: string) => `/quote-requests/opportunities/${id}/decline/`,
   },
   orders: {
     list: "/orders/",

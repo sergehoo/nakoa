@@ -96,9 +96,14 @@ class QuoteOffer(BaseModel):
     breakdown = models.JSONField(default=list, blank=True)
     is_active = models.BooleanField(default=True)
 
+    # Réponse manuelle à une opportunité (l'imprimeur n'avait pas encore activé ce produit)
+    is_opportunity_response = models.BooleanField(default=False)
+    printer_notes = models.TextField(blank=True)
+
     class Meta:
         ordering = ["-score", "total_incl_tax"]
         indexes = [
             models.Index(fields=["request", "tag"]),
             models.Index(fields=["printer", "is_active"]),
+            models.Index(fields=["is_opportunity_response", "is_active"]),
         ]
