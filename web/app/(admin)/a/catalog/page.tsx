@@ -32,10 +32,12 @@ import {
 // Tab 1 — Produits
 // ============================================================================
 
+const ALL = "__all__";
+
 function ProductsTab() {
   const [search, setSearch] = useState("");
-  const [category, setCategory] = useState("");
-  const [statusFilter, setStatusFilter] = useState<"" | "active" | "inactive" | "uncovered">("");
+  const [category, setCategory] = useState<string>(ALL);
+  const [statusFilter, setStatusFilter] = useState<typeof ALL | "active" | "inactive" | "uncovered">(ALL);
   const [page, setPage] = useState(1);
   const debouncedSearch = useDebounce(search, 300);
 
@@ -46,7 +48,7 @@ function ProductsTab() {
     page,
     page_size: 25,
     search: debouncedSearch || undefined,
-    category: category || undefined,
+    category: category === ALL ? undefined : category,
     is_active: statusFilter === "active" ? true : statusFilter === "inactive" ? false : undefined,
     uncovered: statusFilter === "uncovered" ? true : undefined,
   });
@@ -74,7 +76,7 @@ function ProductsTab() {
             <SelectValue placeholder="Toutes catégories" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="">Toutes catégories</SelectItem>
+            <SelectItem value={ALL}>Toutes catégories</SelectItem>
             {categories.map((c) => (
               <SelectItem key={c.slug} value={c.slug}>{c.name}</SelectItem>
             ))}
@@ -83,7 +85,7 @@ function ProductsTab() {
         <Select value={statusFilter} onValueChange={(v) => { setStatusFilter(v as never); setPage(1); }}>
           <SelectTrigger className="md:w-[180px]"><SelectValue placeholder="Statut" /></SelectTrigger>
           <SelectContent>
-            <SelectItem value="">Tous statuts</SelectItem>
+            <SelectItem value={ALL}>Tous statuts</SelectItem>
             <SelectItem value="active">Actifs</SelectItem>
             <SelectItem value="inactive">Inactifs</SelectItem>
             <SelectItem value="uncovered">Sans imprimeur</SelectItem>

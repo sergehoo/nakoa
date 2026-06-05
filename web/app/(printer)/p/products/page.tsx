@@ -299,7 +299,7 @@ function EditDialog({ item }: { item: PrinterProduct }) {
 
 function CatalogTab() {
   const [search, setSearch] = useState("");
-  const [category, setCategory] = useState<string>("");
+  const [category, setCategory] = useState<string>("__all__");
   const [selected, setSelected] = useState<Set<string>>(new Set());
   const debounced = useDebounce(search, 300);
 
@@ -308,7 +308,7 @@ function CatalogTab() {
 
   const { data: avail, isLoading } = useAvailableCatalogProducts({
     search: debounced || undefined,
-    category: category || undefined,
+    category: category === "__all__" ? undefined : category,
   });
   const products = avail?.results ?? [];
 
@@ -367,10 +367,12 @@ function CatalogTab() {
             <SelectValue placeholder="Toutes catégories" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="">Toutes catégories</SelectItem>
-            {categories.map((c) => (
-              <SelectItem key={c.slug} value={c.slug}>{c.name}</SelectItem>
-            ))}
+            <SelectItem value="__all__">Toutes catégories</SelectItem>
+            {categories
+              .filter((c) => c?.slug && c.slug.length > 0)
+              .map((c) => (
+                <SelectItem key={c.slug} value={c.slug}>{c.name}</SelectItem>
+              ))}
           </SelectContent>
         </Select>
       </div>

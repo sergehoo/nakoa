@@ -24,8 +24,10 @@ import {
 } from "@/components/ui/dialog";
 import { useDebounce } from "@/hooks/use-debounce";
 
+const ALL = "__all__";
+
 const COUNTRIES = [
-  { code: "", label: "Tous pays" },
+  { code: ALL, label: "Tous pays" },
   { code: "CI", label: "Côte d'Ivoire" },
   { code: "SN", label: "Sénégal" },
   { code: "BJ", label: "Bénin" },
@@ -36,7 +38,7 @@ const COUNTRIES = [
 ];
 
 const STATUS_OPTIONS = [
-  { code: "", label: "Tous statuts" },
+  { code: ALL, label: "Tous statuts" },
   { code: "pending", label: "En attente" },
   { code: "active", label: "Actif" },
   { code: "probation", label: "Probation" },
@@ -45,7 +47,7 @@ const STATUS_OPTIONS = [
 ];
 
 const KYC_OPTIONS = [
-  { code: "", label: "Tous KYB" },
+  { code: ALL, label: "Tous KYB" },
   { code: "pending", label: "Pending" },
   { code: "submitted", label: "Soumis" },
   { code: "approved", label: "Approuvé" },
@@ -198,9 +200,9 @@ function PrinterRow({ printer }: { printer: AdminPrinter }) {
 
 export default function AdminPrintersPage() {
   const [search, setSearch] = useState("");
-  const [country, setCountry] = useState("");
-  const [status, setStatus] = useState("");
-  const [kyc, setKyc] = useState("");
+  const [country, setCountry] = useState(ALL);
+  const [status, setStatus] = useState(ALL);
+  const [kyc, setKyc] = useState(ALL);
   const [page, setPage] = useState(1);
   const debouncedSearch = useDebounce(search, 300);
 
@@ -208,9 +210,9 @@ export default function AdminPrintersPage() {
     page,
     page_size: 25,
     search: debouncedSearch || undefined,
-    country: country || undefined,
-    status: status || undefined,
-    kyc_status: kyc || undefined,
+    country: country === ALL ? undefined : country,
+    status: status === ALL ? undefined : status,
+    kyc_status: kyc === ALL ? undefined : kyc,
   };
 
   const { data, isLoading, isFetching, error } = useAdminPrinters(filters);
@@ -296,19 +298,19 @@ export default function AdminPrintersPage() {
           <Select value={country} onValueChange={(v) => { setCountry(v); setPage(1); }}>
             <SelectTrigger><SelectValue placeholder="Pays" /></SelectTrigger>
             <SelectContent>
-              {COUNTRIES.map((c) => <SelectItem key={c.code || "all"} value={c.code}>{c.label}</SelectItem>)}
+              {COUNTRIES.map((c) => <SelectItem key={c.code} value={c.code}>{c.label}</SelectItem>)}
             </SelectContent>
           </Select>
           <Select value={status} onValueChange={(v) => { setStatus(v); setPage(1); }}>
             <SelectTrigger><SelectValue placeholder="Statut" /></SelectTrigger>
             <SelectContent>
-              {STATUS_OPTIONS.map((s) => <SelectItem key={s.code || "all"} value={s.code}>{s.label}</SelectItem>)}
+              {STATUS_OPTIONS.map((s) => <SelectItem key={s.code} value={s.code}>{s.label}</SelectItem>)}
             </SelectContent>
           </Select>
           <Select value={kyc} onValueChange={(v) => { setKyc(v); setPage(1); }}>
             <SelectTrigger><SelectValue placeholder="KYB" /></SelectTrigger>
             <SelectContent>
-              {KYC_OPTIONS.map((s) => <SelectItem key={s.code || "all"} value={s.code}>{s.label}</SelectItem>)}
+              {KYC_OPTIONS.map((s) => <SelectItem key={s.code} value={s.code}>{s.label}</SelectItem>)}
             </SelectContent>
           </Select>
         </CardContent>

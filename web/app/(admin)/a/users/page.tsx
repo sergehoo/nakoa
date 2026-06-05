@@ -21,8 +21,10 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { formatDate, initials } from "@/lib/utils";
 import { useDebounce } from "@/hooks/use-debounce";
 
+const ALL = "__all__";
+
 const ROLES = [
-  { code: "", label: "Tous les rôles" },
+  { code: ALL, label: "Tous les rôles" },
   { code: "customer", label: "Client particulier" },
   { code: "customer_corporate", label: "Client entreprise" },
   { code: "printer", label: "Imprimeur" },
@@ -33,7 +35,7 @@ const ROLES = [
 ];
 
 const COUNTRIES = [
-  { code: "", label: "Tous pays" },
+  { code: ALL, label: "Tous pays" },
   { code: "CI", label: "Côte d'Ivoire" },
   { code: "SN", label: "Sénégal" },
   { code: "BJ", label: "Bénin" },
@@ -44,7 +46,7 @@ const COUNTRIES = [
 ];
 
 const STATUS = [
-  { code: "", label: "Tous" },
+  { code: ALL, label: "Tous" },
   { code: "active", label: "Actifs" },
   { code: "suspended", label: "Suspendus" },
   { code: "inactive", label: "Inactifs (non vérifiés)" },
@@ -152,9 +154,9 @@ function UserRow({ user }: { user: AdminUserListItem }) {
 
 export default function AdminUsersPage() {
   const [search, setSearch] = useState("");
-  const [role, setRole] = useState("");
-  const [country, setCountry] = useState("");
-  const [status, setStatus] = useState("");
+  const [role, setRole] = useState(ALL);
+  const [country, setCountry] = useState(ALL);
+  const [status, setStatus] = useState(ALL);
   const [page, setPage] = useState(1);
   const debouncedSearch = useDebounce(search, 300);
 
@@ -162,8 +164,8 @@ export default function AdminUsersPage() {
     page,
     page_size: 25,
     search: debouncedSearch || undefined,
-    primary_role: role || undefined,
-    country: country || undefined,
+    primary_role: role === ALL ? undefined : role,
+    country: country === ALL ? undefined : country,
     is_suspended: status === "suspended" ? true : undefined,
     is_active: status === "inactive" ? false : status === "active" ? true : undefined,
   };
@@ -198,19 +200,19 @@ export default function AdminUsersPage() {
           <Select value={role} onValueChange={(v) => { setRole(v); setPage(1); }}>
             <SelectTrigger><SelectValue placeholder="Rôle" /></SelectTrigger>
             <SelectContent>
-              {ROLES.map((r) => <SelectItem key={r.code || "all"} value={r.code}>{r.label}</SelectItem>)}
+              {ROLES.map((r) => <SelectItem key={r.code} value={r.code}>{r.label}</SelectItem>)}
             </SelectContent>
           </Select>
           <Select value={country} onValueChange={(v) => { setCountry(v); setPage(1); }}>
             <SelectTrigger><SelectValue placeholder="Pays" /></SelectTrigger>
             <SelectContent>
-              {COUNTRIES.map((c) => <SelectItem key={c.code || "all"} value={c.code}>{c.label}</SelectItem>)}
+              {COUNTRIES.map((c) => <SelectItem key={c.code} value={c.code}>{c.label}</SelectItem>)}
             </SelectContent>
           </Select>
           <Select value={status} onValueChange={(v) => { setStatus(v); setPage(1); }}>
             <SelectTrigger><SelectValue placeholder="Statut" /></SelectTrigger>
             <SelectContent>
-              {STATUS.map((s) => <SelectItem key={s.code || "all"} value={s.code}>{s.label}</SelectItem>)}
+              {STATUS.map((s) => <SelectItem key={s.code} value={s.code}>{s.label}</SelectItem>)}
             </SelectContent>
           </Select>
         </CardContent>

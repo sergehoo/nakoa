@@ -246,14 +246,16 @@ function SubmissionRow({ submission, onOpen }: { submission: KYCSubmission; onOp
   );
 }
 
+const ALL = "__all__";
+
 export default function AdminKYCPage() {
-  const [statusFilter, setStatusFilter] = useState<KYCStatus | "">("submitted");
-  const [typeFilter, setTypeFilter] = useState<KYCType | "">("");
+  const [statusFilter, setStatusFilter] = useState<KYCStatus | typeof ALL>("submitted");
+  const [typeFilter, setTypeFilter] = useState<KYCType | typeof ALL>(ALL);
   const [openSub, setOpenSub] = useState<KYCSubmission | null>(null);
 
   const { data, isLoading, error } = useKycSubmissions({
-    status: statusFilter || undefined,
-    type: typeFilter || undefined,
+    status: statusFilter === ALL ? undefined : (statusFilter as KYCStatus),
+    type: typeFilter === ALL ? undefined : (typeFilter as KYCType),
   });
 
   const list = (data as { results: KYCSubmission[] } | KYCSubmission[] | undefined);
@@ -329,10 +331,10 @@ export default function AdminKYCPage() {
       {/* Filtres */}
       <Card>
         <CardContent className="grid gap-3 p-4 md:grid-cols-2">
-          <Select value={statusFilter} onValueChange={(v) => setStatusFilter(v as KYCStatus | "")}>
+          <Select value={statusFilter} onValueChange={(v) => setStatusFilter(v as KYCStatus | typeof ALL)}>
             <SelectTrigger><SelectValue /></SelectTrigger>
             <SelectContent>
-              <SelectItem value="">Tous statuts</SelectItem>
+              <SelectItem value={ALL}>Tous statuts</SelectItem>
               <SelectItem value="submitted">À traiter</SelectItem>
               <SelectItem value="under_review">En revue</SelectItem>
               <SelectItem value="needs_info">Complément demandé</SelectItem>
@@ -340,10 +342,10 @@ export default function AdminKYCPage() {
               <SelectItem value="rejected">Rejetés</SelectItem>
             </SelectContent>
           </Select>
-          <Select value={typeFilter} onValueChange={(v) => setTypeFilter(v as KYCType | "")}>
+          <Select value={typeFilter} onValueChange={(v) => setTypeFilter(v as KYCType | typeof ALL)}>
             <SelectTrigger><SelectValue /></SelectTrigger>
             <SelectContent>
-              <SelectItem value="">Tous types</SelectItem>
+              <SelectItem value={ALL}>Tous types</SelectItem>
               <SelectItem value="business">KYB Imprimeur uniquement</SelectItem>
               <SelectItem value="customer">KYC Client uniquement</SelectItem>
             </SelectContent>
