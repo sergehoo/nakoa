@@ -70,7 +70,8 @@ const NAV: Record<SidebarRole, NavSection[]> = {
     {
       title: "Activité commerciale",
       items: [
-        { href: "/p/catalog", label: "Catalogue & prix", icon: Boxes },
+        { href: "/p/products", label: "Mes produits", icon: Boxes },
+        { href: "/p/catalog", label: "Grilles tarifaires", icon: BarChart3 },
         { href: "/p/billing", label: "Facturation", icon: Wallet },
       ],
     },

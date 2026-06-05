@@ -11,7 +11,9 @@ from .viewsets import (
     MachineViewSet,
     PrinterAgentViewSet,
     PrinterDirectoryViewSet,
+    PrinterProductViewSet,
     PrinterProfileViewSet,
+    ProductOfferingsView,
 )
 
 router = DefaultRouter()
@@ -23,6 +25,8 @@ router.register("delivery-zones", DeliveryZoneViewSet, basename="delivery-zone")
 router.register("capabilities", CapabilityViewSet, basename="capability")
 router.register("agents", PrinterAgentViewSet, basename="agent")
 router.register("members", PrinterMemberViewSet, basename="member")
+router.register("printer-products", PrinterProductViewSet, basename="printer-product")
+router.register("product-offerings", ProductOfferingsView, basename="product-offering")
 
 urlpatterns = [
     # PrintHub Score

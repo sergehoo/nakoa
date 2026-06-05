@@ -149,3 +149,59 @@ class PrinterAgent(BaseModel):
     can_manage_pricing = models.BooleanField(default=False)
     can_manage_team = models.BooleanField(default=False)
     is_active = models.BooleanField(default=True)
+
+
+class PrinterProduct(BaseModel):
+    """Association imprimeur ↔ produit du catalogue central Nakoa.
+
+    Le catalogue (apps.catalog.Product) est partagé. Chaque imprimeur active
+    uniquement les produits qu'il sait fabriquer et y associe ses propres
+    prix, délais, capacités et options techniques.
+    """
+
+    printer = models.ForeignKey(
+        PrinterProfile, on_delete=models.CASCADE, related_name="printer_products",
+    )
+    product = models.ForeignKey(
+        "catalog.Product", on_delete=models.CASCADE, related_name="printer_offerings",
+    )
+
+    # Prix de base
+    min_price = models.DecimalField(max_digits=12, decimal_places=2, default=Decimal("0"))
+    setup_cost = models.DecimalField(max_digits=10, decimal_places=2, default=Decimal("0"))
+    currency = models.CharField(max_length=8, default="XOF")
+
+    # Capacité & délais
+    daily_capacity = models.PositiveIntegerField(default=1000)
+    standard_lead_time_days = models.PositiveIntegerField(default=3)
+    express_lead_time_days = models.PositiveIntegerField(default=1)
+    express_surcharge_pct = models.DecimalField(max_digits=5, decimal_places=2, default=Decimal("30"))
+
+    # Options techniques (jsonb)
+    supported_formats = models.JSONField(default=list, blank=True)
+    supported_finishes = models.JSONField(default=list, blank=True)
+    supported_papers = models.JSONField(default=list, blank=True)
+    custom_options = models.JSONField(default=dict, blank=True)
+
+    notes = models.TextField(blank=True)
+    is_active = models.BooleanField(default=True)
+    is_express_available = models.BooleanField(default=False)
+
+    # Stats (mises à jour par signal/job)
+    orders_count = models.PositiveIntegerField(default=0)
+    last_order_at = models.DateTimeField(null=True, blank=True)
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=["printer", "product"], name="uq_printer_product",
+            ),
+        ]
+        indexes = [
+            models.Index(fields=["printer", "is_active"]),
+            models.Index(fields=["product", "is_active"]),
+        ]
+        ordering = ["-is_active", "-orders_count", "-created_at"]
+
+    def __str__(self) -> str:
+        return f"{self.printer.trade_name or self.printer.legal_name} — {self.product.name}"

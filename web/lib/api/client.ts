@@ -129,6 +129,12 @@ export const endpoints = {
     deliveryZoneDetail: (id: string) => `/printers/delivery-zones/${id}/`,
     members: "/printers/members/",
     memberDetail: (id: string) => `/printers/members/${id}/`,
+    // Catalogue imprimeur (PrinterProduct)
+    printerProducts: "/printers/printer-products/",
+    printerProductDetail: (id: string) => `/printers/printer-products/${id}/`,
+    printerProductAvailable: "/printers/printer-products/available/",
+    printerProductBulkActivate: "/printers/printer-products/bulk-activate/",
+    productOfferings: "/printers/product-offerings/",
   },
   pricing: {
     grids: "/pricing/grids/",
