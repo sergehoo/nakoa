@@ -374,7 +374,7 @@ function MachinesCard() {
 
   const handleSave = (id?: string) => async (data: MachineForm) => {
     try {
-      await save.mutateAsync({ id, payload: data as Partial<Machine> });
+      await save.mutateAsync({ id, payload: data as unknown as Partial<Machine> });
       toast.success(id ? "Machine mise à jour" : "Machine ajoutée");
     } catch {
       toast.error("Échec de l'enregistrement");
@@ -580,7 +580,7 @@ function ZonesCard() {
 
   const handleSave = (id?: string) => async (data: ZoneForm) => {
     try {
-      await save.mutateAsync({ id, payload: data as Partial<DeliveryZone> });
+      await save.mutateAsync({ id, payload: data as unknown as Partial<DeliveryZone> });
       toast.success(id ? "Zone mise à jour" : "Zone ajoutée");
     } catch {
       toast.error("Échec");

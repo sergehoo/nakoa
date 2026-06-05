@@ -192,14 +192,18 @@ function TierDialog({
 
   const submit = async (data: TierForm) => {
     try {
-      await save.mutateAsync({
-        id: initial?.id,
-        payload: {
-          ...data,
-          grid: gridId,
-          max_quantity: data.max_quantity === "" ? null : Number(data.max_quantity),
-        } as Partial<PriceTier>,
-      });
+      // DRF DecimalField attend des strings côté serialization, donc on convertit
+      // les nombres du formulaire en strings avant l'envoi.
+      const payload: Partial<PriceTier> = {
+        grid: gridId,
+        min_quantity: data.min_quantity,
+        max_quantity: data.max_quantity === "" || data.max_quantity === undefined
+          ? null
+          : Number(data.max_quantity),
+        unit_price: String(data.unit_price),
+        discount_pct: String(data.discount_pct),
+      };
+      await save.mutateAsync({ id: initial?.id, payload });
       toast.success(initial ? "Palier mis à jour" : "Palier ajouté");
       setOpen(false);
       reset();
@@ -327,7 +331,7 @@ function GridRow({ grid, refresh }: { grid: PriceGrid; refresh: () => void }) {
               initial={grid}
               onSubmit={async (data) => {
                 try {
-                  await save.mutateAsync({ id: grid.id, payload: data as Partial<PriceGrid> });
+                  await save.mutateAsync({ id: grid.id, payload: data as unknown as Partial<PriceGrid> });
                   toast.success("Grille mise à jour");
                 } catch {
                   toast.error("Échec de la mise à jour");
@@ -416,7 +420,7 @@ export default function PrinterCatalogPage() {
 
   const handleCreate = async (data: GridForm) => {
     try {
-      await save.mutateAsync({ payload: data as Partial<PriceGrid> });
+      await save.mutateAsync({ payload: data as unknown as Partial<PriceGrid> });
       toast.success("Grille créée");
     } catch (e: unknown) {
       const err = e as { response?: { data?: { detail?: string; product?: string[] } } };
