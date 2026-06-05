@@ -84,18 +84,34 @@ class PrinterProfileViewSet(viewsets.ModelViewSet):
 
 
 class _PrinterScopedViewSet(viewsets.ModelViewSet):
-    """Base : restreint au PrinterProfile de l'utilisateur courant."""
+    """Base : restreint au PrinterProfile de l'utilisateur courant.
+
+    Si l'utilisateur n'a pas encore de PrinterProfile, on retourne un queryset
+    vide plutôt que de crasher. La permission IsPrinterMember devrait normalement
+    bloquer ces cas en amont, mais on garde la défense en profondeur.
+    """
 
     permission_classes = [IsAuthenticated, IsPrinterMember]
 
     def _printer(self):
-        return self.request.user.printer_profile
+        user = self.request.user
+        try:
+            return user.printer_profile
+        except Exception:  # noqa: BLE001
+            return None
 
     def get_queryset(self):
-        return self.queryset.filter(printer=self._printer())
+        printer = self._printer()
+        if printer is None:
+            return self.queryset.none()
+        return self.queryset.filter(printer=printer)
 
     def perform_create(self, serializer):
-        serializer.save(printer=self._printer())
+        printer = self._printer()
+        if printer is None:
+            from rest_framework.exceptions import PermissionDenied
+            raise PermissionDenied("Aucun PrinterProfile associé à ce compte.")
+        serializer.save(printer=printer)
 
 
 class MachineViewSet(_PrinterScopedViewSet):
@@ -138,6 +154,8 @@ class PrinterProductViewSet(_PrinterScopedViewSet):
         """Produits du catalogue Nakoa que l'imprimeur n'a PAS encore activés."""
         from apps.catalog.models import Product
         printer = self._printer()
+        if printer is None:
+            return Response({"count": 0, "results": []})
         activated_ids = PrinterProduct.objects.filter(printer=printer).values_list("product_id", flat=True)
         qs = (
             Product.objects.filter(is_active=True)

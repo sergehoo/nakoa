@@ -23,11 +23,23 @@ class IsStaffOrReadOnly(BasePermission):
 
 
 class IsPrinterMember(BasePermission):
-    """Réservé aux comptes liés à un PrinterProfile."""
+    """Réservé aux comptes liés à un PrinterProfile existant."""
+
+    message = "Ce compte n'est pas associé à un profil imprimeur."
 
     def has_permission(self, request, view):
         user = request.user
-        return bool(user and user.is_authenticated and getattr(user, "primary_role", None) in {"printer", "printer_agent"})
+        if not (user and user.is_authenticated):
+            return False
+        role = getattr(user, "primary_role", None)
+        if role not in {"printer", "printer_agent"}:
+            return False
+        # Vérifie qu'un PrinterProfile existe vraiment (évite le crash en aval)
+        try:
+            _ = user.printer_profile
+            return True
+        except Exception:  # noqa: BLE001
+            return False
 
 
 class IsCustomer(BasePermission):
