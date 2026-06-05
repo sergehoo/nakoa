@@ -174,19 +174,33 @@ class PrinterProductViewSet(_PrinterScopedViewSet):
 
         results = []
         for p in qs[:200]:
+            # Défense : ignore tout produit dont la catégorie est cassée (soft-deleted, etc.)
+            try:
+                cat = p.category
+                if not cat:
+                    continue
+                category_payload = {
+                    "id": str(cat.id),
+                    "name": cat.name or "",
+                    "slug": cat.slug or "",
+                }
+            except Exception:  # noqa: BLE001
+                continue
+
+            try:
+                cover_url = p.cover_image.url if p.cover_image else None
+            except Exception:  # noqa: BLE001
+                cover_url = None
+
             results.append({
                 "id": str(p.id),
-                "name": p.name,
-                "slug": p.slug,
-                "short_description": p.short_description,
-                "cover_image": p.cover_image.url if p.cover_image else None,
-                "category": {
-                    "id": str(p.category_id),
-                    "name": p.category.name,
-                    "slug": p.category.slug,
-                },
-                "min_quantity": p.min_quantity,
-                "lead_time_days": p.lead_time_days,
+                "name": p.name or "",
+                "slug": p.slug or "",
+                "short_description": p.short_description or "",
+                "cover_image": cover_url,
+                "category": category_payload,
+                "min_quantity": p.min_quantity or 1,
+                "lead_time_days": p.lead_time_days or 3,
             })
         return Response({"count": len(results), "results": results})
 

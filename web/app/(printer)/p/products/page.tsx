@@ -457,14 +457,16 @@ function CatalogTab() {
         </Card>
       ) : (
         <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-3">
-          {products.map((p) => (
-            <AvailableProductCard
-              key={p.id}
-              product={p}
-              selected={selected.has(p.id)}
-              onToggle={() => toggle(p.id)}
-            />
-          ))}
+          {products
+            .filter((p) => p && p.id)
+            .map((p) => (
+              <AvailableProductCard
+                key={p.id}
+                product={p}
+                selected={selected.has(p.id)}
+                onToggle={() => toggle(p.id)}
+              />
+            ))}
         </div>
       )}
     </div>
@@ -502,19 +504,21 @@ function AvailableProductCard({
         <Layers className="h-5 w-5" />
       </div>
 
-      <h3 className="font-semibold leading-tight">{product.name}</h3>
+      <h3 className="font-semibold leading-tight">{product.name ?? "Produit sans nom"}</h3>
       <p className="mt-1 line-clamp-2 text-xs text-muted-foreground">
-        {product.short_description}
+        {product.short_description ?? ""}
       </p>
 
       <div className="mt-3 flex flex-wrap items-center gap-2 text-xs">
+        {product.category?.name && (
+          <Badge variant="secondary" className="gap-1">
+            <Boxes className="h-3 w-3" /> {product.category.name}
+          </Badge>
+        )}
         <Badge variant="secondary" className="gap-1">
-          <Boxes className="h-3 w-3" /> {product.category.name}
+          <Clock className="h-3 w-3" /> {product.lead_time_days ?? 3}j
         </Badge>
-        <Badge variant="secondary" className="gap-1">
-          <Clock className="h-3 w-3" /> {product.lead_time_days}j
-        </Badge>
-        <Badge variant="secondary">Min. {product.min_quantity}</Badge>
+        <Badge variant="secondary">Min. {product.min_quantity ?? 1}</Badge>
       </div>
     </button>
   );
