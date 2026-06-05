@@ -23,7 +23,16 @@ export interface User {
   kyc_level: 0 | 1 | 2 | 3 | 4;
   country: string;
   locale: string;
+  timezone?: string;
   preferred_currency: string;
+  is_active?: boolean;
+  is_suspended?: boolean;
+  is_staff?: boolean;
+  is_superuser?: boolean;
+  last_login_at?: string | null;
+  last_login_ip?: string | null;
+  last_login_user_agent?: string | null;
+  suspension_reason?: string;
   created_at: string;
 }
 
