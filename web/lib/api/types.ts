@@ -75,14 +75,21 @@ export interface Order {
   product: UUID;
   product_detail?: { name: string; slug: string; primary_image?: string };
   quantity: number;
+  unit_price_excl_tax?: string;
   total_excl_tax: string;
   total_incl_tax: string;
+  vat_amount?: string;
+  delivery_fee?: string;
+  platform_commission?: string;
+  printer_payout?: string;
   currency: string;
   status: OrderStatus;
+  delivery_country?: string;
   delivery_address: Record<string, string>;
   expected_delivery_at?: string;
   delivered_at?: string;
   paid_at?: string;
+  metadata?: Record<string, unknown>;
   created_at: string;
   updated_at: string;
 }
