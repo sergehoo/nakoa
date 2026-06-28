@@ -504,6 +504,47 @@ services:
     mem_reservation: 128m
 
   # ===========================================================================
+  # Backups PostgreSQL automatiques (quotidiens via cron interne)
+  # Démarré par défaut. Dumps stockés dans le volume nakoa_dbbackups.
+  # ===========================================================================
+  nakoabackup:
+    image: postgres:16-alpine
+    container_name: nakoa_backup
+    restart: unless-stopped
+    environment:
+      TZ: Africa/Abidjan
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      PGHOST: nakoaDB
+      BACKUP_DIR: /backups
+      RETENTION: "14"
+      S3_ENABLED: "false"  # passe à "true" et fournis S3_BUCKET pour upload distant
+    volumes:
+      - nakoa_dbbackups:/backups
+      - ./deploy/postgres/backup.sh:/usr/local/bin/backup.sh:ro
+      - ./deploy/postgres/restore.sh:/usr/local/bin/restore.sh:ro
+    networks: [nakoa_network]
+    depends_on:
+      nakoaDB:
+        condition: service_healthy
+    # Cron interne : backup à 02h00 chaque jour
+    entrypoint: ["/bin/sh", "-c"]
+    command: |
+      "apk add --no-cache bash dcron tzdata gzip findutils &&
+       chmod +x /usr/local/bin/backup.sh /usr/local/bin/restore.sh &&
+       echo '0 2 * * * /usr/local/bin/backup.sh >> /var/log/backup.log 2>&1' | crontab - &&
+       touch /var/log/backup.log &&
+       echo '✓ Backup cron actif — dump quotidien à 02:00 Africa/Abidjan' &&
+       echo '  Manuel : docker exec nakoa_backup /usr/local/bin/backup.sh' &&
+       crond -f -l 2 &
+       tail -f /var/log/backup.log"
+    logging: *logging_rotated
+    cpus: "0.3"
+    mem_limit: 256m
+    mem_reservation: 64m
+
+  # ===========================================================================
   # Container "manage" — usage manuel pour migrations, shell, collectstatic
   #   docker compose -f docker-compose.prod.yml run --rm nakoamanage \
   #     python manage.py migrate

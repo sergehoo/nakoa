@@ -16,6 +16,8 @@ import {
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
+import { ThemeToggle } from "@/components/layout/theme-toggle";
+import { NakoaLogo } from "@/components/brand/nakoa-logo";
 
 // ============================================================
 // PRODUITS — Catalogue éditorial monochrome
@@ -50,11 +52,8 @@ function PremiumHeader() {
       className="sticky top-0 z-50 w-full glass border-b border-border/60"
     >
       <div className="container flex h-16 items-center justify-between">
-        <Link href="/" className="flex items-center gap-3">
-          <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary text-primary-foreground">
-            <Printer className="h-4 w-4" />
-          </div>
-          <div className="font-display text-lg font-semibold tracking-tight">Nakoa</div>
+        <Link href="/" className="flex items-center gap-2" aria-label="Nakoa — accueil">
+          <NakoaLogo variant="wordmark" size={36} priority />
         </Link>
 
         <nav className="hidden gap-1 md:flex">
@@ -74,7 +73,8 @@ function PremiumHeader() {
           ))}
         </nav>
 
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1 md:gap-2">
+          <ThemeToggle />
           <Button asChild variant="ghost" size="sm" className="hidden md:flex">
             <Link href="/login">Connexion</Link>
           </Button>

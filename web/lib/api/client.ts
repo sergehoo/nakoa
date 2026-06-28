@@ -163,6 +163,16 @@ export const endpoints = {
     conversations: "/assistant/conversations/",
     send: (id: string) => `/assistant/conversations/${id}/send/`,
   },
+  chat: {
+    conversations: "/chat/conversations/",
+    conversationDetail: (id: string) => `/chat/conversations/${id}/`,
+    messages: (id: string) => `/chat/conversations/${id}/messages/`,
+  },
+  reviews: {
+    list: "/reviews/",
+    detail: (id: string) => `/reviews/${id}/`,
+    respond: (id: string) => `/reviews/${id}/respond/`,
+  },
   ai: {
     batAnalyses: "/ai/bat-analyses/",
     runBatAnalysis: "/ai/bat-analyses/run/",

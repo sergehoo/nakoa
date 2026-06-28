@@ -1,12 +1,15 @@
 "use client";
 
 import { useParams } from "next/navigation";
-import { Check, Circle } from "lucide-react";
+import { Check, CheckCircle2, Circle } from "lucide-react";
 import { useOrder } from "@/hooks/use-orders";
+import { useOrderReview } from "@/hooks/use-reviews";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { OrderStatusBadge } from "@/components/domain/order-status-badge";
 import { BatUploader } from "@/components/domain/bat-uploader";
+import { ReviewForm } from "@/components/domain/review-form";
+import { StarRating } from "@/components/domain/star-rating";
 import { formatCurrency, formatDateTime } from "@/lib/utils";
 import { cn } from "@/lib/utils";
 import { useWebSocket } from "@/hooks/use-websocket";
@@ -26,6 +29,7 @@ export default function OrderDetailPage() {
   const { id } = useParams<{ id: string }>();
   const qc = useQueryClient();
   const { data: order, isLoading } = useOrder(id);
+  const { data: existingReview } = useOrderReview(id);
 
   useWebSocket({
     path: `/ws/orders/${id}/`,
@@ -116,6 +120,47 @@ export default function OrderDetailPage() {
           <p>{order.delivery_address.city}, {order.delivery_address.country}</p>
         </CardContent>
       </Card>
+
+      {/* Notation après livraison */}
+      {["delivered", "completed"].includes(order.status) && !existingReview && (
+        <ReviewForm
+          orderId={order.id}
+          printerName={order.printer_detail?.trade_name}
+        />
+      )}
+
+      {/* Affiche l'avis publié */}
+      {existingReview && (
+        <Card className="surface-premium">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <CheckCircle2 className="h-4 w-4 text-emerald-400" />
+              Votre avis publié
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-3">
+            <div className="flex items-center gap-3">
+              <StarRating value={existingReview.overall_rating} readOnly showValue />
+              {existingReview.title && (
+                <span className="font-semibold">{existingReview.title}</span>
+              )}
+            </div>
+            {existingReview.body && (
+              <p className="text-sm text-muted-foreground italic">
+                « {existingReview.body} »
+              </p>
+            )}
+            {existingReview.printer_response && (
+              <div className="rounded-lg border-l-2 border-orange-500/50 bg-orange-500/5 p-3 text-sm">
+                <p className="text-xs font-semibold text-orange-400">
+                  Réponse de l&apos;imprimeur
+                </p>
+                <p className="mt-1">{existingReview.printer_response}</p>
+              </div>
+            )}
+          </CardContent>
+        </Card>
+      )}
 
       {/* BAT uploader visible tant que la commande n'est pas en production */}
       {["paid", "accepted", "files_received"].includes(order.status) && (

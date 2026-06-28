@@ -7,13 +7,14 @@ import {
   Activity, BarChart3, Bell, Boxes, Building2, ClipboardList,
   CreditCard, FileText, HelpCircle, Home, LayoutDashboard, MapPin,
   MessageSquare, Package, Printer, Search, Settings, ShieldCheck,
-  ShoppingCart, Sparkles, Star, Truck, Users, Wallet, Zap,
+  ShoppingCart, Sparkles, Star, Truck, Users, Wallet,
   type LucideIcon,
 } from "lucide-react";
 
 import { cn } from "@/lib/utils";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
+import { NakoaLogo } from "@/components/brand/nakoa-logo";
 
 export type SidebarRole = "customer" | "printer" | "admin";
 
@@ -43,6 +44,8 @@ const NAV: Record<SidebarRole, NavSection[]> = {
       items: [
         { href: "/quotes", label: "Mes devis", icon: FileText },
         { href: "/orders", label: "Mes commandes", icon: Package },
+        { href: "/chat", label: "Messages", icon: MessageSquare },
+        { href: "/notifications", label: "Notifications", icon: Bell },
       ],
     },
     {
@@ -74,6 +77,13 @@ const NAV: Record<SidebarRole, NavSection[]> = {
         { href: "/p/products", label: "Mes produits", icon: Boxes },
         { href: "/p/catalog", label: "Grilles tarifaires", icon: BarChart3 },
         { href: "/p/billing", label: "Facturation", icon: Wallet },
+      ],
+    },
+    {
+      title: "Réputation",
+      items: [
+        { href: "/p/reviews", label: "Avis clients", icon: Star },
+        { href: "/chat", label: "Messages", icon: MessageSquare },
       ],
     },
     {
@@ -239,9 +249,7 @@ export function SidebarPremium({ role }: { role: SidebarRole }) {
     <aside className="hidden h-screen w-64 shrink-0 flex-col border-r bg-card md:sticky md:top-0 md:flex">
       {/* Brand */}
       <div className="flex h-16 items-center gap-3 border-b px-4">
-        <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-orange-500 via-amber-500 to-rose-500 text-white shadow-lg shadow-orange-500/30">
-          <Zap className="h-4 w-4" />
-        </div>
+        <NakoaLogo variant="icon-bg" size={36} />
         <div className="flex flex-col">
           <span className="font-display text-base font-bold leading-tight">Nakoa</span>
           <span className="text-[10px] uppercase tracking-wider text-muted-foreground">

@@ -24,19 +24,28 @@ import { formatCurrency, formatDateTime } from "@/lib/utils";
 import { cn } from "@/lib/utils";
 
 interface PaymentProvider {
-  code: "wave" | "orange_money" | "mtn_momo" | "moov" | "card_stripe";
+  code: "paystack" | "wave" | "orange_money" | "mtn_momo" | "moov" | "card_stripe";
   label: string;
   description: string;
   badge: string;
   needs_phone: boolean;
+  recommended?: boolean;
 }
 
 const PROVIDERS: PaymentProvider[] = [
   {
+    code: "paystack",
+    label: "Paystack",
+    description: "Cartes bancaires + Mobile Money — paiement instantané sécurisé",
+    badge: "Recommandé",
+    needs_phone: false,
+    recommended: true,
+  },
+  {
     code: "wave",
     label: "Wave",
     description: "Paiement Mobile Money sans frais (CI, SN)",
-    badge: "Le plus utilisé",
+    badge: "",
     needs_phone: true,
   },
   {
@@ -62,15 +71,15 @@ const PROVIDERS: PaymentProvider[] = [
   },
   {
     code: "card_stripe",
-    label: "Carte bancaire",
-    description: "Visa, Mastercard — paiement sécurisé via Stripe",
-    badge: "International",
+    label: "Carte bancaire (Stripe)",
+    description: "Visa, Mastercard — paiement sécurisé via Stripe (international)",
+    badge: "",
     needs_phone: false,
   },
 ];
 
 function ProviderIcon({ code }: { code: PaymentProvider["code"] }) {
-  if (code === "card_stripe") return <CreditCard className="h-5 w-5" />;
+  if (code === "card_stripe" || code === "paystack") return <CreditCard className="h-5 w-5" />;
   return <Smartphone className="h-5 w-5" />;
 }
 
@@ -81,7 +90,7 @@ export default function CheckoutPage() {
   const { data: savedMethods } = usePaymentMethods();
   const methodsList = (savedMethods as PaymentMethod[] | undefined) ?? [];
 
-  const [selectedProvider, setSelectedProvider] = useState<PaymentProvider["code"]>("wave");
+  const [selectedProvider, setSelectedProvider] = useState<PaymentProvider["code"]>("paystack");
   const [phone, setPhone] = useState("");
   const [savedMethodId, setSavedMethodId] = useState<string | null>(null);
 
@@ -93,7 +102,7 @@ export default function CheckoutPage() {
       const payload: Record<string, unknown> = {
         order_id: id,
         provider_code: selectedProvider,
-        return_url: `${window.location.origin}/orders/${id}?payment=success`,
+        return_url: `${window.location.origin}/orders/${id}/payment-callback`,
       };
       const provider = PROVIDERS.find((p) => p.code === selectedProvider);
       if (provider?.needs_phone) {

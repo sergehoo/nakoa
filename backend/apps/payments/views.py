@@ -104,3 +104,85 @@ def wave_webhook(request):
     if payment and event.get("status") in {"success", "completed", "paid"}:
         capture_payment(payment)
     return Response({"received": True})
+
+
+@api_view(["POST"])
+@permission_classes([AllowAny])
+def paystack_webhook(request):
+    """Webhook Paystack — vérification HMAC SHA512 sur secret_key.
+
+    Events traités :
+    - charge.success → capture le paiement
+    - charge.failed  → marque l'échec (logged uniquement)
+    - refund.processed → log
+    """
+    provider = get_provider("paystack")
+    event = provider.verify_webhook(request)
+    if not event:
+        return Response({"detail": "invalid signature"}, status=400)
+
+    event_type = event.get("event", "")
+    data = event.get("data", {})
+    ref = data.get("reference")
+
+    if not ref:
+        return Response({"received": True, "ignored": "no reference"})
+
+    payment = Payment.objects.filter(reference=ref).first()
+    if not payment:
+        return Response({"received": True, "ignored": "payment not found"})
+
+    if event_type == "charge.success":
+        capture_payment(payment)
+    elif event_type == "charge.failed":
+        payment.status = "failed"
+        payment.failed_reason = data.get("gateway_response", "Paystack: failed")
+        payment.save(update_fields=["status", "failed_reason"])
+
+    return Response({"received": True, "event": event_type})
+
+
+@api_view(["GET"])
+@permission_classes([IsAuthenticated])
+def verify_payment(request):
+    """Endpoint manuel : le frontend appelle après le retour callback du provider
+    pour confirmer immédiatement le paiement (sans attendre le webhook).
+
+    GET /api/v1/payments/verify/?reference=PAY_ABC123
+    """
+    ref = request.query_params.get("reference")
+    if not ref:
+        return Response({"detail": "reference required"}, status=400)
+
+    payment = Payment.objects.filter(reference=ref).first()
+    if not payment:
+        return Response({"detail": "payment not found"}, status=404)
+
+    # Sécurité : seul le client propriétaire ou un staff peut vérifier
+    if payment.customer != request.user and not request.user.is_staff:
+        return Response({"detail": "forbidden"}, status=403)
+
+    # Si déjà capturé, on renvoie l'état actuel
+    if payment.status in {"captured", "succeeded"}:
+        return Response(PaymentSerializer(payment).data)
+
+    # Vérification active auprès du provider (Paystack uniquement pour l'instant)
+    if payment.provider == "paystack":
+        import requests
+        from django.conf import settings as dj_settings
+        cfg = (dj_settings.PAYMENT_PROVIDERS or {}).get("paystack", {})
+        secret = cfg.get("secret_key", "")
+        try:
+            r = requests.get(
+                f"https://api.paystack.co/transaction/verify/{ref}",
+                headers={"Authorization": f"Bearer {secret}"},
+                timeout=10,
+            )
+            data = r.json()
+            if data.get("status") and data["data"].get("status") == "success":
+                capture_payment(payment)
+                payment.refresh_from_db()
+        except Exception:  # noqa: BLE001
+            pass
+
+    return Response(PaymentSerializer(payment).data)

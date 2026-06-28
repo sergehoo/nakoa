@@ -10,18 +10,24 @@ const inter = Inter({ subsets: ["latin"], variable: "--font-inter", display: "sw
 const sora = Sora({ subsets: ["latin"], variable: "--font-display", display: "swap" });
 
 export const metadata: Metadata = {
+  metadataBase: new URL("https://nakoahub.com"),
   title: { default: "Nakoa — Imprimer commence ici.", template: "%s · Nakoa" },
   description:
     "Nakoa — Plateforme SaaS d'impression : marketplace intelligente, ERP de production et IA — pour l'Afrique de l'Ouest.",
-  keywords: ["imprimerie", "impression", "marketplace", "Côte d'Ivoire", "Mobile Money"],
+  keywords: ["imprimerie", "impression", "marketplace", "Côte d'Ivoire", "Mobile Money", "Paystack"],
   authors: [{ name: "Nakoa" }],
   openGraph: {
     type: "website",
     locale: "fr_FR",
-    url: "https://printhub.io",
+    url: "https://nakoahub.com",
     title: "Nakoa — Imprimer commence ici",
     description: "Imprimez. Livrez. Brillez. La plateforme intelligente d'impression pour l'Afrique de l'Ouest.",
     siteName: "Nakoa",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Nakoa — Imprimer commence ici",
+    description: "Imprimez. Livrez. Brillez.",
   },
 };
 
@@ -30,7 +36,7 @@ export const viewport: Viewport = {
   initialScale: 1,
   themeColor: [
     { media: "(prefers-color-scheme: light)", color: "#ffffff" },
-    { media: "(prefers-color-scheme: dark)", color: "#0b0f17" },
+    { media: "(prefers-color-scheme: dark)", color: "#0b0710" }, // teinte chaude Nakoa
   ],
 };
 
