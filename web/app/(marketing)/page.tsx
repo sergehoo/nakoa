@@ -18,6 +18,8 @@ import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
 import { ThemeToggle } from "@/components/layout/theme-toggle";
 import { NakoaLogo } from "@/components/brand/nakoa-logo";
+import { LandingAuthCTA } from "@/components/layout/landing-auth-cta";
+import { useLandingStats } from "@/hooks/use-landing-stats";
 
 // ============================================================
 // PRODUITS — Catalogue éditorial monochrome
@@ -75,14 +77,7 @@ function PremiumHeader() {
 
         <div className="flex items-center gap-1 md:gap-2">
           <ThemeToggle />
-          <Button asChild variant="ghost" size="sm" className="hidden md:flex">
-            <Link href="/login">Connexion</Link>
-          </Button>
-          <Button asChild size="sm">
-            <Link href="/register">
-              Commander <ArrowRight className="h-3.5 w-3.5" />
-            </Link>
-          </Button>
+          <LandingAuthCTA />
         </div>
       </div>
     </motion.header>
@@ -492,9 +487,35 @@ function Showcase() {
 // STATISTIQUES
 // ============================================================
 function Stats() {
+  const { data: live, isLoading } = useLandingStats();
+
+  // Formatte un nombre en chaîne lisible : 1234 → "1 234", 12500 → "12.5K", 100000 → "100K+"
+  const fmt = (n: number | undefined, suffix = ""): string => {
+    if (!n || n <= 0) return "—";
+    if (n >= 100_000) return `${Math.floor(n / 1000)}K+${suffix}`;
+    if (n >= 10_000) return `${(n / 1000).toFixed(1).replace(/\.0$/, "")}K${suffix}`;
+    if (n >= 1000) return `${(n / 1000).toFixed(1).replace(/\.0$/, "")}K${suffix}`;
+    return `${n}${suffix}`;
+  };
+
+  // Tant que le backend n'a pas de données ou est offline, on affiche des valeurs
+  // de référence pour ne pas casser la promesse marketing.
+  const fallback = {
+    printers: "500+",
+    orders: "100K+",
+  };
+
   const stats = [
-    { k: "500+", v: "Imprimeurs partenaires", icon: Printer },
-    { k: "100K+", v: "Commandes traitées", icon: Package },
+    {
+      k: isLoading ? "…" : live && live.active_printers > 0 ? fmt(live.active_printers, "+") : fallback.printers,
+      v: "Imprimeurs partenaires",
+      icon: Printer,
+    },
+    {
+      k: isLoading ? "…" : live && live.orders_completed > 0 ? fmt(live.orders_completed, "+") : fallback.orders,
+      v: "Commandes traitées",
+      icon: Package,
+    },
     { k: "98%", v: "Clients satisfaits", icon: BadgeCheck },
     { k: "24h", v: "Délai moyen", icon: Zap },
   ];

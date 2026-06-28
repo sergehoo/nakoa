@@ -73,6 +73,9 @@ export const endpoints = {
     twoFADisable: "/auth/2fa/disable/",
   },
   me: "/accounts/me/",
+  public: {
+    landingStats: "/analytics/public/stats/",
+  },
   accounts: {
     addresses: "/accounts/addresses/",
     addressDetail: (id: string) => `/accounts/addresses/${id}/`,

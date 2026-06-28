@@ -14,10 +14,19 @@ User = get_user_model()
 
 class RegisterSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True, min_length=10, validators=[validate_password])
+    # Champs optionnels pour les rôles pro (printer / customer_corporate). Write-only :
+    # n'apparaissent pas dans la réponse et n'existent pas sur User.
+    legal_name = serializers.CharField(write_only=True, required=False, allow_blank=True, max_length=255)
+    trade_name = serializers.CharField(write_only=True, required=False, allow_blank=True, max_length=255)
+    city = serializers.CharField(write_only=True, required=False, allow_blank=True, max_length=160)
 
     class Meta:
         model = User
-        fields = ["email", "phone", "first_name", "last_name", "password", "country", "locale", "primary_role"]
+        fields = [
+            "email", "phone", "first_name", "last_name", "password",
+            "country", "locale", "primary_role",
+            "legal_name", "trade_name", "city",
+        ]
         extra_kwargs = {
             "primary_role": {"required": False, "default": Role.CUSTOMER},
         }
@@ -28,11 +37,48 @@ class RegisterSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError("Rôle non autorisé à l'inscription publique.")
         return value or Role.CUSTOMER
 
+    def validate(self, attrs):
+        # Pour les rôles pro, la raison sociale est obligatoire.
+        role = attrs.get("primary_role") or Role.CUSTOMER
+        if role in {Role.PRINTER, Role.CUSTOMER_CORPORATE}:
+            if not (attrs.get("legal_name") or "").strip():
+                raise serializers.ValidationError(
+                    {"legal_name": "La raison sociale est requise pour ce type de compte."}
+                )
+        return attrs
+
     def create(self, validated_data):
         password = validated_data.pop("password")
+        legal_name = (validated_data.pop("legal_name", "") or "").strip()
+        trade_name = (validated_data.pop("trade_name", "") or "").strip()
+        city = (validated_data.pop("city", "") or "").strip()
+
         user = User(**validated_data)
         user.set_password(password)
         user.save()
+
+        # Enrichit le PrinterProfile auto-créé par le signal (apps/printers/signals.py).
+        if user.primary_role == Role.PRINTER and (legal_name or trade_name or city):
+            try:
+                from apps.printers.models import PrinterProfile
+
+                profile = PrinterProfile.objects.filter(owner=user).first()
+                if profile:
+                    update_fields = []
+                    if legal_name:
+                        profile.legal_name = legal_name
+                        update_fields.append("legal_name")
+                    if trade_name:
+                        profile.trade_name = trade_name
+                        update_fields.append("trade_name")
+                    if city and hasattr(profile, "city"):
+                        profile.city = city
+                        update_fields.append("city")
+                    if update_fields:
+                        profile.save(update_fields=update_fields)
+            except Exception:  # noqa: BLE001
+                # Pas bloquant : l'utilisateur peut compléter dans son onboarding KYB.
+                pass
         return user
 
 

@@ -9,6 +9,7 @@ from .views_finance import (
     printer_profitability,
     saas_kpis,
 )
+from .views_public import landing_stats
 from .views_sla import (
     my_sla,
     printer_sla,
@@ -21,6 +22,9 @@ router = DefaultRouter()
 router.register("events", AnalyticsEventViewSet, basename="analytics-event")
 
 urlpatterns = [
+    # Public — landing page
+    path("public/stats/", landing_stats, name="public-landing-stats"),
+
     # Financial intelligence
     path("finance/orders/<uuid:order_id>/margin/", order_margin, name="order-margin"),
     path("finance/printers/me/", printer_profitability, name="printer-profitability-me"),

@@ -6,7 +6,8 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { Loader2 } from "lucide-react";
+import { Eye, EyeOff, Loader2 } from "lucide-react";
+import { NakoaLogo } from "@/components/brand/nakoa-logo";
 import { toast } from "sonner";
 
 import { useLogin } from "@/hooks/use-auth";
@@ -49,6 +50,7 @@ function LoginForm() {
   const search = useSearchParams();
   const fromParam = safeReturnPath(search.get("from"));
   const [needs2FA, setNeeds2FA] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
   const login = useLogin();
 
   const {
@@ -58,6 +60,8 @@ function LoginForm() {
   } = useForm<FormData>({ resolver: zodResolver(schema) });
 
   const onSubmit = async (data: FormData) => {
+    // Double-click protection : si une requête est en cours, on ignore.
+    if (login.isPending) return;
     try {
       const res = await login.mutateAsync(data);
       toast.success(`Bienvenue ${res.user.full_name}`);
@@ -167,11 +171,21 @@ function LoginForm() {
 
   return (
     <div className="space-y-6">
-      <div className="space-y-2">
-        <h1 className="font-display text-3xl font-bold tracking-tight">Connexion</h1>
+      <div className="space-y-4">
+        <div className="flex items-center gap-3">
+          <NakoaLogo variant="icon-bg" size={44} />
+          <div>
+            <h1 className="font-display text-2xl font-bold tracking-tight lg:text-3xl">
+              Bon retour sur Nakoa
+            </h1>
+            <p className="text-sm text-muted-foreground">
+              Connectez-vous pour gérer vos commandes et votre atelier.
+            </p>
+          </div>
+        </div>
         <p className="text-sm text-muted-foreground">
           Pas encore de compte ?{" "}
-          <Link href="/register" className="text-primary font-medium hover:underline">
+          <Link href="/register/choose" className="text-primary font-medium hover:underline">
             Créer un compte
           </Link>
         </p>
@@ -202,7 +216,24 @@ function LoginForm() {
               Mot de passe oublié ?
             </Link>
           </div>
-          <Input id="password" type="password" autoComplete="current-password" {...register("password")} />
+          <div className="relative">
+            <Input
+              id="password"
+              type={showPassword ? "text" : "password"}
+              autoComplete="current-password"
+              className="pr-10"
+              {...register("password")}
+            />
+            <button
+              type="button"
+              tabIndex={-1}
+              aria-label={showPassword ? "Masquer le mot de passe" : "Afficher le mot de passe"}
+              onClick={() => setShowPassword((v) => !v)}
+              className="absolute right-2 top-1/2 -translate-y-1/2 rounded-md p-1.5 text-muted-foreground hover:bg-secondary hover:text-foreground"
+            >
+              {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+            </button>
+          </div>
           {errors.password && <p className="text-xs text-destructive">{errors.password.message}</p>}
         </div>
 
