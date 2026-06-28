@@ -63,13 +63,38 @@ class Command(BaseCommand):
             )
             if sent:
                 self.stdout.write(self.style.SUCCESS(f"✓ Email envoyé à {to} (compteur Django : {sent})"))
-                self.stdout.write(
-                    "  Vérifiez votre boîte de réception (et le dossier spam !).\n"
-                    "  Si rien ne vient sous 2 minutes, vérifiez :\n"
-                    "  - Sender Authentication SendGrid (domaine ou Single Sender vérifié)\n"
-                    "  - Quota SendGrid (100/jour en gratuit)\n"
-                    "  - Logs SendGrid sur https://app.sendgrid.com/email_activity"
-                )
+                # Détecte le provider pour des conseils ciblés
+                host = (settings.EMAIL_HOST or "").lower()
+                self.stdout.write("  Vérifiez votre boîte de réception (et le dossier spam !).")
+                self.stdout.write("  Si rien ne vient sous 2 minutes, vérifiez :")
+                if "hostinger" in host:
+                    self.stdout.write(
+                        "  - Boîte email Hostinger active dans hPanel → Emails → Comptes Email\n"
+                        "  - DNS SPF présent (dig TXT votredomaine.com | grep spf)\n"
+                        "  - Logs Hostinger : hPanel → Emails → Outils → Logs"
+                    )
+                elif "sendgrid" in host:
+                    self.stdout.write(
+                        "  - Sender Authentication SendGrid (domaine ou Single Sender vérifié)\n"
+                        "  - Quota SendGrid (100/jour en gratuit)\n"
+                        "  - Logs SendGrid sur https://app.sendgrid.com/email_activity"
+                    )
+                elif "brevo" in host or "sendinblue" in host:
+                    self.stdout.write(
+                        "  - Sender autorisé dans Brevo (Senders, Domains & Dedicated IPs)\n"
+                        "  - Logs Brevo : Statistics → Email Activity"
+                    )
+                elif "mailgun" in host:
+                    self.stdout.write(
+                        "  - Domaine vérifié dans Mailgun (SPF + DKIM)\n"
+                        "  - Logs Mailgun : Sending → Logs"
+                    )
+                else:
+                    self.stdout.write(
+                        "  - Authentification SMTP correcte\n"
+                        "  - DNS SPF/DKIM bien configurés\n"
+                        "  - Logs de votre provider"
+                    )
             else:
                 self.stdout.write(self.style.ERROR("✗ Aucun email envoyé (send_mail retourne 0)."))
         except Exception as exc:  # noqa: BLE001

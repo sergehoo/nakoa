@@ -57,7 +57,12 @@ export function useLogout() {
 export function useOtpRequest() {
   return useMutation({
     mutationFn: async (payload: { identifier: string; purpose: string; channel?: string }) => {
-      const { data } = await api.post(endpoints.auth.otpRequest, {
+      const { data } = await api.post<{
+        otp_id: string;
+        expires_at: string;
+        expires_in_seconds: number;
+        max_attempts: number;
+      }>(endpoints.auth.otpRequest, {
         channel: "sms",
         ...payload,
       });

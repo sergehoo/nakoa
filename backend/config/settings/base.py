@@ -192,15 +192,10 @@ ACCOUNT_USER_MODEL_EMAIL_FIELD = "email"
 ACCOUNT_EMAIL_VERIFICATION = "optional"   # on gère la vérif via notre propre OTP
 ACCOUNT_UNIQUE_EMAIL = True
 
-# Nouveaux noms allauth >= 65.x (les anciens ACCOUNT_AUTHENTICATION_METHOD/USERNAME_REQUIRED
-# sont conservés en synonyme pour compat, mais ces constantes-ci sont la source de vérité)
+# allauth >= 65.x — nouveaux noms (les anciens ACCOUNT_AUTHENTICATION_METHOD /
+# ACCOUNT_EMAIL_REQUIRED / ACCOUNT_USERNAME_REQUIRED sont dépréciés.)
 ACCOUNT_LOGIN_METHODS = {"email"}
 ACCOUNT_SIGNUP_FIELDS = ["email*", "password1*", "password2*"]
-
-# Synonymes pour les versions < 65 (sans effet sur 65+, mais sans danger)
-ACCOUNT_AUTHENTICATION_METHOD = "email"
-ACCOUNT_USERNAME_REQUIRED = False
-ACCOUNT_EMAIL_REQUIRED = True
 
 PASSWORD_HASHERS = [
     "django.contrib.auth.hashers.Argon2PasswordHasher",

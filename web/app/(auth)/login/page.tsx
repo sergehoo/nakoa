@@ -76,15 +76,49 @@ function LoginForm() {
           data?: {
             detail?: string | Record<string, string[] | string>;
             title?: string;
+            reason?: string;
+            identifier?: string;
+            redirect_to?: string;
+            suspension_reason?: string;
+            locked_until?: string;
           };
         };
       };
       const status = err?.response?.status;
       const detail = err?.response?.data?.detail;
       const title = err?.response?.data?.title;
+      const reason = err?.response?.data?.reason;
+      const detailStr = typeof detail === "string" ? detail : "";
+
+      // CAS 1 — Email non vérifié : redirige automatiquement vers /otp
+      if (reason === "email_not_verified") {
+        const userEmail = err?.response?.data?.identifier ?? data.email;
+        toast.message("Email non vérifié", {
+          description: "Un nouveau code de vérification vous a été envoyé.",
+        });
+        router.push(`/otp?identifier=${encodeURIComponent(userEmail)}&purpose=email_verify`);
+        return;
+      }
+
+      // CAS 2 — Compte suspendu
+      if (reason === "account_suspended") {
+        toast.error("Compte suspendu", {
+          description: err?.response?.data?.suspension_reason
+            ? `Motif : ${err.response.data.suspension_reason}`
+            : "Contactez le support pour plus d'informations.",
+        });
+        return;
+      }
+
+      // CAS 3 — Compte verrouillé temporairement
+      if (reason === "account_locked") {
+        toast.error("Compte verrouillé", {
+          description: detailStr || "Trop de tentatives échouées. Patientez avant de réessayer.",
+        });
+        return;
+      }
 
       // Détection 2FA (string ou title)
-      const detailStr = typeof detail === "string" ? detail : "";
       const hint = `${detailStr} ${title ?? ""}`.toLowerCase();
       if (hint.includes("2fa") || hint.includes("two-factor")) {
         setNeeds2FA(true);
