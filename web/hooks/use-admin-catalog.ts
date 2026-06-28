@@ -18,8 +18,13 @@ export interface AdminCategory {
   created_at: string;
 }
 
+interface AdminCategoriesShape {
+  results: AdminCategory[];
+  count: number;
+}
+
 export function useAdminCategories() {
-  return useQuery<{ results: AdminCategory[]; count: number } | AdminCategory[]>({
+  return useQuery<AdminCategory[] | AdminCategoriesShape, Error, AdminCategoriesShape>({
     queryKey: ["admin-categories"],
     queryFn: async () => {
       const { data } = await api.get(endpoints.admin.catalogCategories, {
@@ -27,7 +32,7 @@ export function useAdminCategories() {
       });
       return data;
     },
-    select: (raw) => {
+    select: (raw): AdminCategoriesShape => {
       if (Array.isArray(raw)) return { results: raw, count: raw.length };
       return raw;
     },
