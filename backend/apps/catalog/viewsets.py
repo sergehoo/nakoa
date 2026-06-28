@@ -34,13 +34,37 @@ class ProductViewSet(viewsets.ReadOnlyModelViewSet):
     )
     permission_classes = [AllowAny]
     lookup_field = "slug"
-    filterset_fields = ["category", "is_featured"]
+    # `category` est géré manuellement dans get_queryset (slug OU UUID).
+    filterset_fields = ["is_featured"]
     search_fields = ["name", "short_description", "tags"]
     ordering_fields = ["sort_order", "lead_time_days", "created_at"]
+
+    @staticmethod
+    def _looks_like_uuid(value: str) -> bool:
+        """`True` si la chaîne ressemble à un UUID v4 (36 chars avec tirets)."""
+        if not value or not isinstance(value, str):
+            return False
+        if len(value) not in (32, 36):
+            return False
+        try:
+            import uuid as _uuid
+            _uuid.UUID(value)
+            return True
+        except (ValueError, AttributeError):
+            return False
 
     def get_queryset(self):  # type: ignore[override]
         qs = super().get_queryset()
         params = self.request.query_params
+
+        # ----- Catégorie : accepte UUID (id) OU slug (insensible à la casse) -----
+        category = params.get("category")
+        if category:
+            if self._looks_like_uuid(category):
+                qs = qs.filter(category_id=category)
+            else:
+                # Normalise vers lower-case pour matcher slugs en base
+                qs = qs.filter(category__slug__iexact=category)
 
         # Filtres "prix": s'appliquent sur le min_price des PrinterProduct actifs liés
         price_min = self._to_decimal(params.get("price_min"))
