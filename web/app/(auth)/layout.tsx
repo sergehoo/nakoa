@@ -1,7 +1,43 @@
+"use client";
+
 import Link from "next/link";
+import { usePathname } from "next/navigation";
+
 import { NakoaLogo } from "@/components/brand/nakoa-logo";
 
 export default function AuthLayout({ children }: { children: React.ReactNode }) {
+  const pathname = usePathname();
+
+  // Pages qui ont besoin de la pleine largeur (grilles, multi-colonnes…).
+  // On évite le split-screen + max-w-md qui écrase le contenu.
+  const FULL_WIDTH_ROUTES = ["/register/choose"];
+  const isFullWidth = FULL_WIDTH_ROUTES.some((r) => pathname?.startsWith(r));
+
+  if (isFullWidth) {
+    return (
+      <div className="min-h-screen">
+        {/* Halo lumineux discret en arrière-plan */}
+        <div className="pointer-events-none fixed inset-x-0 top-0 -z-10 h-[420px] bg-gradient-to-b from-pink-500/10 via-violet-500/5 to-transparent" />
+
+        {/* Header simple avec logo + retour accueil */}
+        <header className="container flex items-center justify-between py-6">
+          <Link href="/" aria-label="Nakoa — accueil">
+            <NakoaLogo variant="wordmark" size={40} priority />
+          </Link>
+          <Link
+            href="/login"
+            className="text-sm font-medium text-muted-foreground hover:text-foreground"
+          >
+            Se connecter →
+          </Link>
+        </header>
+
+        <main className="container pb-16">{children}</main>
+      </div>
+    );
+  }
+
+  // Layout par défaut : split-screen + formulaire centré max-w-md
   return (
     <div className="grid min-h-screen md:grid-cols-2">
       {/* Hero side */}

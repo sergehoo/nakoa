@@ -64,59 +64,61 @@ const ACCOUNT_TYPES = [
 
 export default function ChooseAccountTypePage() {
   return (
-    <div className="mx-auto max-w-5xl space-y-8 py-8">
-      <div className="space-y-2 text-center">
-        <h1 className="font-display text-3xl font-bold tracking-tight lg:text-4xl">
+    <div className="mx-auto max-w-6xl space-y-10 py-4 md:py-8">
+      <div className="mx-auto max-w-2xl space-y-3 text-center">
+        <h1 className="font-display text-3xl font-bold tracking-tight md:text-4xl lg:text-5xl">
           Bienvenue sur Nakoa
         </h1>
-        <p className="mx-auto max-w-xl text-base text-muted-foreground">
-          Quel type de compte voulez-vous créer ? Vous pourrez toujours en changer plus tard.
+        <p className="text-base text-muted-foreground md:text-lg">
+          Quel type de compte voulez-vous créer ?
+          <br className="hidden md:block" />
+          <span className="text-muted-foreground/80">Vous pourrez toujours en changer plus tard.</span>
         </p>
       </div>
 
-      <div className="grid gap-4 md:grid-cols-3">
+      <div className="grid gap-6 md:grid-cols-3">
         {ACCOUNT_TYPES.map((type) => {
           const Icon = type.icon;
           return (
             <Link key={type.code} href={type.href} className="group block">
-              <Card className="relative h-full overflow-hidden border-border/60 transition-all hover:-translate-y-1 hover:border-orange-500/50 hover:shadow-xl hover:shadow-orange-500/10">
+              <Card className="relative flex h-full flex-col overflow-hidden border-border/60 transition-all hover:-translate-y-1 hover:border-orange-500/50 hover:shadow-xl hover:shadow-orange-500/10">
                 {type.badge && (
                   <Badge
                     variant="secondary"
-                    className="absolute right-3 top-3 text-[10px]"
+                    className="absolute right-4 top-4 text-[10px]"
                   >
                     {type.badge}
                   </Badge>
                 )}
 
-                <CardContent className="space-y-4 p-6">
+                <CardContent className="flex flex-1 flex-col gap-5 p-7">
                   <div
-                    className={`flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br ${type.accent}`}
+                    className={`flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br ${type.accent}`}
                   >
-                    <Icon className="h-6 w-6" />
+                    <Icon className="h-7 w-7" />
                   </div>
 
-                  <div>
-                    <h2 className="font-display text-xl font-bold leading-tight">
+                  <div className="space-y-1.5">
+                    <h2 className="font-display text-2xl font-bold leading-tight">
                       {type.title}
                     </h2>
-                    <p className="text-sm text-muted-foreground">{type.subtitle}</p>
+                    <p className="text-sm font-medium text-foreground/70">{type.subtitle}</p>
                   </div>
 
-                  <p className="text-sm leading-snug text-muted-foreground">
+                  <p className="text-sm leading-relaxed text-muted-foreground">
                     {type.description}
                   </p>
 
-                  <ul className="space-y-1.5 text-sm">
+                  <ul className="space-y-2 text-sm">
                     {type.features.map((f) => (
                       <li key={f} className="flex items-start gap-2">
-                        <CheckCircle2 className="mt-0.5 h-3.5 w-3.5 shrink-0 text-emerald-400" />
-                        <span className="text-foreground/80">{f}</span>
+                        <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-emerald-500" />
+                        <span className="text-foreground/85">{f}</span>
                       </li>
                     ))}
                   </ul>
 
-                  <div className="flex items-center justify-between border-t pt-3 text-sm font-medium text-orange-400">
+                  <div className="mt-auto flex items-center justify-between border-t pt-4 text-sm font-semibold text-orange-500">
                     <span>Créer mon compte</span>
                     <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
                   </div>
@@ -129,7 +131,7 @@ export default function ChooseAccountTypePage() {
 
       <p className="text-center text-sm text-muted-foreground">
         Vous avez déjà un compte ?{" "}
-        <Link href="/login" className="font-medium text-orange-400 hover:underline">
+        <Link href="/login" className="font-medium text-orange-500 hover:underline">
           Se connecter
         </Link>
       </p>
