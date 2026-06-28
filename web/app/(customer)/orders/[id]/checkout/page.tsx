@@ -22,6 +22,8 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Separator } from "@/components/ui/separator";
 import { formatCurrency, formatDateTime } from "@/lib/utils";
 import { cn } from "@/lib/utils";
+import { CouponInput } from "@/components/promotions/coupon-input";
+import type { ValidateResult } from "@/hooks/use-promotions";
 
 interface PaymentProvider {
   code: "paystack" | "wave" | "orange_money" | "mtn_momo" | "moov" | "card_stripe";
@@ -93,6 +95,7 @@ export default function CheckoutPage() {
   const [selectedProvider, setSelectedProvider] = useState<PaymentProvider["code"]>("paystack");
   const [phone, setPhone] = useState("");
   const [savedMethodId, setSavedMethodId] = useState<string | null>(null);
+  const [appliedCoupon, setAppliedCoupon] = useState<ValidateResult | null>(null);
 
   // Préselectionne la méthode par défaut sauvegardée
   const defaultMethod = methodsList.find((m) => m.is_default);
@@ -104,6 +107,10 @@ export default function CheckoutPage() {
         provider_code: selectedProvider,
         return_url: `${window.location.origin}/orders/${id}/payment-callback`,
       };
+      if (appliedCoupon?.code) {
+        // Le backend pourra appliquer/valider le code à la création du paiement.
+        payload.coupon_code = appliedCoupon.code;
+      }
       const provider = PROVIDERS.find((p) => p.code === selectedProvider);
       if (provider?.needs_phone) {
         payload.phone_number = phone || defaultMethod?.phone_number || "";
@@ -153,7 +160,9 @@ export default function CheckoutPage() {
   }
 
   const selectedProviderObj = PROVIDERS.find((p) => p.code === selectedProvider)!;
-  const orderTotal = Number(order.total_incl_tax);
+  const orderTotalRaw = Number(order.total_incl_tax);
+  const discount = appliedCoupon ? Number(appliedCoupon.discount_amount) : 0;
+  const orderTotal = Math.max(0, orderTotalRaw - discount);
 
   return (
     <div className="space-y-6">
@@ -343,13 +352,38 @@ export default function CheckoutPage() {
                 </div>
               )}
 
+              {/* Code promo */}
+              <div className="space-y-2 rounded-md border border-dashed bg-secondary/20 p-3">
+                <CouponInput
+                  orderTotal={orderTotalRaw}
+                  onApplied={(res) => setAppliedCoupon(res)}
+                  onCleared={() => setAppliedCoupon(null)}
+                />
+              </div>
+
+              {appliedCoupon && discount > 0 && (
+                <div className="flex justify-between text-emerald-600">
+                  <span className="font-medium">
+                    Remise ({appliedCoupon.code})
+                  </span>
+                  <span>− {formatCurrency(discount, order.currency)}</span>
+                </div>
+              )}
+
               <Separator />
 
               <div className="flex items-baseline justify-between">
                 <span className="font-semibold">Total à payer</span>
-                <span className="font-display text-2xl font-bold">
-                  {formatCurrency(orderTotal, order.currency)}
-                </span>
+                <div className="text-right">
+                  {discount > 0 && (
+                    <p className="text-xs text-muted-foreground line-through">
+                      {formatCurrency(orderTotalRaw, order.currency)}
+                    </p>
+                  )}
+                  <span className="font-display text-2xl font-bold">
+                    {formatCurrency(orderTotal, order.currency)}
+                  </span>
+                </div>
               </div>
             </CardContent>
           </Card>

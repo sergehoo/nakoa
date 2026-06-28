@@ -119,6 +119,7 @@ const NAV: Record<SidebarRole, NavSection[]> = {
         { href: "/a/revenue", label: "Revenue Engine", icon: TrendingUp },
         { href: "/a/subscriptions", label: "Abonnements", icon: Wallet },
         { href: "/a/promotions", label: "Promotions", icon: Tag },
+        { href: "/a/services", label: "Services premium", icon: Sparkles },
       ],
     },
     {

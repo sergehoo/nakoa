@@ -62,6 +62,7 @@ api_v1_patterns = [
     # ========== Revenue Engine (monétisation) ==========
     path("revenue/", include("apps.revenue_engine.urls")),
     path("promotions/", include("apps.promotions.urls")),
+    path("premium-services/", include("apps.premium_services.urls")),
 ]
 
 

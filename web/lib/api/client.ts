@@ -82,6 +82,12 @@ export const endpoints = {
     unsubscribe: "/notifications/push/unsubscribe/",
     test: "/notifications/push/test/",
   },
+  premiumServices: {
+    categories: "/premium-services/categories/",
+    services: "/premium-services/services/",
+    serviceDetail: (id: string) => `/premium-services/services/${id}/`,
+    price: "/premium-services/price/",
+  },
   promotions: {
     validate: "/promotions/validate/",
     campaigns: "/promotions/campaigns/",
