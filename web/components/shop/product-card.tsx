@@ -1,8 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import Image from "next/image";
-import { Eye, Heart, Package, ShoppingCart } from "lucide-react";
+import { Eye, Heart, ShoppingCart } from "lucide-react";
 import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
@@ -11,6 +10,7 @@ import { Badge } from "@/components/ui/badge";
 import { formatCurrency } from "@/lib/utils";
 import { useCart } from "@/stores/cart";
 import { useWishlist } from "@/stores/wishlist";
+import { ProductIcon } from "@/components/shop/product-icon";
 import type { Product } from "@/lib/api/types";
 
 /**
@@ -75,22 +75,19 @@ export function ProductCard({
       {/* Visuel */}
       <Link
         href={`/products/${product.slug}`}
-        className="relative block aspect-[4/3] overflow-hidden bg-gradient-to-br from-secondary/40 to-secondary/10"
+        className="relative block"
         aria-label={`Voir ${product.name}`}
       >
-        {cover ? (
-          <Image
-            src={cover}
-            alt={product.name}
-            fill
-            sizes="(max-width: 768px) 100vw, 25vw"
-            className="object-cover transition group-hover:scale-105"
-          />
-        ) : (
-          <div className="flex h-full items-center justify-center">
-            <Package className="h-14 w-14 text-muted-foreground/40" />
-          </div>
-        )}
+        <ProductIcon
+          product={{
+            slug: product.slug,
+            name: product.name,
+            primary_image: cover,
+            category_name: product.category_name,
+            category: typeof product.category === "object" ? product.category : undefined,
+          }}
+          sizes="(max-width: 768px) 50vw, 25vw"
+        />
 
         {product.is_featured && (
           <Badge className="absolute left-2 top-2 bg-pink-500 text-white shadow-md">

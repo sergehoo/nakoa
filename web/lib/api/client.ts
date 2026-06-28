@@ -140,6 +140,8 @@ export const endpoints = {
     categories: "/catalog/categories/",
     products: "/catalog/products/",
     productBySlug: (slug: string) => `/catalog/products/${slug}/`,
+    productPrinters: (slug: string) => `/catalog/products/${slug}/printers/`,
+    productReviews: (slug: string) => `/catalog/products/${slug}/reviews/`,
   },
   quotes: {
     list: "/quote-requests/",
