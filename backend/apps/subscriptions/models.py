@@ -25,7 +25,10 @@ class Plan(BaseModel):
         PRINTER = "printer", _("Imprimeurs")
         COURIER = "courier", _("Livreurs")
 
-    tier = models.CharField(max_length=16, choices=Tier.choices, unique=True)
+    # `tier` est désormais une catégorie (Basic/Pro/Premium/Enterprise) — plusieurs
+    # plans peuvent partager le même tier (ex: printer-pro + corporate-team).
+    # L'identifiant stable et unique est `code`.
+    tier = models.CharField(max_length=16, choices=Tier.choices, db_index=True)
     name = models.CharField(max_length=80)
     description = models.TextField(blank=True)
     monthly_price = models.DecimalField(max_digits=15, decimal_places=2, default=Decimal("0"))

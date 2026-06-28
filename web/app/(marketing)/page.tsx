@@ -19,7 +19,10 @@ import { Card } from "@/components/ui/card";
 import { ThemeToggle } from "@/components/layout/theme-toggle";
 import { NakoaLogo } from "@/components/brand/nakoa-logo";
 import { LandingAuthCTA } from "@/components/layout/landing-auth-cta";
+import { HeaderShopActions } from "@/components/shop/header-shop-actions";
 import { useLandingStats } from "@/hooks/use-landing-stats";
+import { useProducts } from "@/hooks/use-catalog";
+import { ProductCard } from "@/components/shop/product-card";
 
 // ============================================================
 // PRODUITS — Catalogue éditorial monochrome
@@ -76,6 +79,7 @@ function PremiumHeader() {
         </nav>
 
         <div className="flex items-center gap-1 md:gap-2">
+          <HeaderShopActions />
           <ThemeToggle />
           <LandingAuthCTA />
         </div>
@@ -198,52 +202,53 @@ function Hero() {
 // PRODUITS — Grille épurée
 // ============================================================
 function Products() {
+  // Pull real products from the backend catalog. Affiche les 10 premiers
+  // (featured d'abord), le reste est accessible via /products.
+  const { data, isLoading } = useProducts({ page_size: 10, ordering: "-is_featured,name" });
+  const products = data?.results ?? [];
+
   return (
     <section id="products" className="container py-24">
       <SectionTitle
-        chip="Catalogue"
-        title="Plus de 15 catégories d'impression"
-        subtitle="Du simple flyer aux campagnes XXL — tout est imprimable sur Nakoa avec qualité professionnelle garantie."
+        chip="Boutique"
+        title="Commandez en quelques clics"
+        subtitle="Ajoutez au panier, personnalisez vos options, puis validez votre commande. Aucun compte requis pour explorer."
       />
 
-      <div className="mt-12 grid gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
-        {PRODUCTS.map((p, i) => (
-          <motion.div
-            key={p.name}
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: "-50px" }}
-            transition={{ delay: i * 0.03, duration: 0.4 }}
-            whileHover={{ y: -4 }}
-          >
-            <Link href="/register" className="block h-full">
-              <div className="card-premium group h-full rounded-2xl p-5">
-                {p.popular && (
-                  <Badge className="absolute right-3 top-3 bg-foreground text-background border-0 text-[10px]">
-                    <Star className="h-3 w-3" /> Populaire
-                  </Badge>
-                )}
-                <div className="flex h-28 items-center justify-center rounded-xl bg-secondary/40 transition-colors group-hover:bg-secondary">
-                  <p.icon className="h-12 w-12 text-foreground" strokeWidth={1.2} />
-                </div>
-                <h3 className="mt-4 font-display text-base font-semibold leading-tight">{p.name}</h3>
-                <div className="mt-4 flex items-end justify-between text-xs">
-                  <div>
-                    <p className="text-muted-foreground">À partir de</p>
-                    <p className="font-semibold text-foreground">{p.from} XOF</p>
-                  </div>
-                  <div className="flex items-center gap-1 text-muted-foreground">
-                    <Clock className="h-3 w-3" /> {p.days}
-                  </div>
-                </div>
-                <div className="mt-4 flex items-center justify-between border-t pt-3">
-                  <span className="text-xs font-medium text-foreground/70">Commander</span>
-                  <ArrowUpRight className="h-3.5 w-3.5 text-foreground/40 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5 group-hover:text-foreground" />
-                </div>
-              </div>
-            </Link>
-          </motion.div>
-        ))}
+      {isLoading ? (
+        <div className="mt-12 grid gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
+          {Array.from({ length: 10 }).map((_, i) => (
+            <div key={i} className="aspect-[3/4] animate-pulse rounded-2xl bg-secondary/30" />
+          ))}
+        </div>
+      ) : products.length === 0 ? (
+        <p className="mt-12 text-center text-muted-foreground">
+          Aucun produit disponible pour le moment.{" "}
+          <Link href="/quotes/new" className="text-primary hover:underline">
+            Demander un devis personnalisé
+          </Link>
+          .
+        </p>
+      ) : (
+        <motion.div
+          initial={{ opacity: 0 }}
+          whileInView={{ opacity: 1 }}
+          viewport={{ once: true, margin: "-50px" }}
+          transition={{ duration: 0.5 }}
+          className="mt-12 grid gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5"
+        >
+          {products.map((p) => (
+            <ProductCard key={p.id} product={p} />
+          ))}
+        </motion.div>
+      )}
+
+      <div className="mt-10 text-center">
+        <Button asChild size="lg" variant="outline">
+          <Link href="/products">
+            Voir tout le catalogue <ArrowRight className="ml-1.5 h-4 w-4" />
+          </Link>
+        </Button>
       </div>
     </section>
   );
