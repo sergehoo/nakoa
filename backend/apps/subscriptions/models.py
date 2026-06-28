@@ -18,6 +18,13 @@ class Plan(BaseModel):
         PREMIUM = "premium", _("Premium")
         ENTERPRISE = "enterprise", _("Enterprise")
 
+    class TargetRole(models.TextChoices):
+        ANY = "any", _("Tout le monde")
+        CUSTOMER = "customer", _("Particuliers")
+        CUSTOMER_CORPORATE = "customer_corporate", _("Entreprises")
+        PRINTER = "printer", _("Imprimeurs")
+        COURIER = "courier", _("Livreurs")
+
     tier = models.CharField(max_length=16, choices=Tier.choices, unique=True)
     name = models.CharField(max_length=80)
     description = models.TextField(blank=True)
@@ -33,6 +40,40 @@ class Plan(BaseModel):
 
     features = models.JSONField(default=list, blank=True)
     is_active = models.BooleanField(default=True)
+
+    # ------------------------------------------------------------
+    # Extension Phase 3 — Subscription Engine configurable BO
+    # ------------------------------------------------------------
+    code = models.SlugField(
+        max_length=64, unique=True, blank=True, db_index=True,
+        help_text=_("Identifiant stable (ex: pro-monthly). Auto-généré sinon."),
+    )
+    is_public = models.BooleanField(_("visible sur /pricing"), default=True)
+    is_highlight = models.BooleanField(_("plan mis en avant"), default=False)
+    sort_order = models.PositiveIntegerField(default=100, db_index=True)
+    trial_days = models.PositiveIntegerField(_("jours d'essai gratuit"), default=0)
+    tagline = models.CharField(_("accroche"), max_length=200, blank=True, default="")
+    cta_label = models.CharField(_("texte du bouton"), max_length=80, blank=True, default="")
+    target_role = models.CharField(
+        _("cible"), max_length=24, choices=TargetRole.choices, default=TargetRole.ANY,
+        db_index=True,
+    )
+    quotas = models.JSONField(
+        _("quotas additionnels"), default=dict, blank=True,
+        help_text=_("Quotas libres au format JSON (ex: {api_requests_day: 1000})."),
+    )
+
+    class Meta(BaseModel.Meta):
+        ordering = ("sort_order", "monthly_price")
+
+    def __str__(self) -> str:
+        return f"{self.name} ({self.tier})"
+
+    def save(self, *args, **kwargs):
+        if not self.code:
+            from django.utils.text import slugify
+            self.code = slugify(f"{self.tier}-{self.name}")[:64]
+        super().save(*args, **kwargs)
 
 
 class Subscription(BaseModel):

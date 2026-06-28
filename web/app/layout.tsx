@@ -4,6 +4,8 @@ import { NextIntlClientProvider } from "next-intl";
 import { getMessages } from "next-intl/server";
 
 import { Providers } from "@/components/providers";
+import { ServiceWorkerRegister } from "@/components/pwa/service-worker-register";
+import { PWAInstallPrompt } from "@/components/pwa/install-prompt";
 import "./globals.css";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter", display: "swap" });
@@ -16,6 +18,22 @@ export const metadata: Metadata = {
     "Nakoa — Plateforme SaaS d'impression : marketplace intelligente, ERP de production et IA — pour l'Afrique de l'Ouest.",
   keywords: ["imprimerie", "impression", "marketplace", "Côte d'Ivoire", "Mobile Money", "Paystack"],
   authors: [{ name: "Nakoa" }],
+  manifest: "/manifest.webmanifest",
+  applicationName: "Nakoa",
+  appleWebApp: {
+    capable: true,
+    title: "Nakoa",
+    statusBarStyle: "black-translucent",
+    startupImage: ["/apple-touch-icon.png"],
+  },
+  formatDetection: { telephone: false },
+  icons: {
+    icon: [
+      { url: "/icon-192.png", sizes: "192x192", type: "image/png" },
+      { url: "/icon-512.png", sizes: "512x512", type: "image/png" },
+    ],
+    apple: [{ url: "/apple-touch-icon.png", sizes: "180x180", type: "image/png" }],
+  },
   openGraph: {
     type: "website",
     locale: "fr_FR",
@@ -48,6 +66,8 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         <NextIntlClientProvider messages={messages}>
           <Providers>{children}</Providers>
         </NextIntlClientProvider>
+        <ServiceWorkerRegister />
+        <PWAInstallPrompt />
       </body>
     </html>
   );

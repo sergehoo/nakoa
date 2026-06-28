@@ -58,6 +58,10 @@ api_v1_patterns = [
     path("workflows/", include("apps.workflows.urls")),
     path("documents/", include("apps.documents.urls")),
     path("storage/", include("apps.storage.urls")),
+
+    # ========== Revenue Engine (monétisation) ==========
+    path("revenue/", include("apps.revenue_engine.urls")),
+    path("promotions/", include("apps.promotions.urls")),
 ]
 
 

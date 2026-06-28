@@ -37,6 +37,38 @@ class NotificationTemplate(BaseModel):
     push_body_template = models.CharField(max_length=255, blank=True)
 
 
+class WebPushSubscription(BaseModel):
+    """Abonnement Web Push d'un utilisateur sur un appareil/navigateur.
+
+    Compatible iOS 16.4+ (Safari) + Chrome/Firefox/Edge Desktop + Android.
+    """
+
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL, on_delete=models.CASCADE,
+        related_name="push_subscriptions",
+    )
+    endpoint = models.TextField(unique=True, help_text=_("URL d'endpoint push fournie par le navigateur."))
+    p256dh = models.CharField(max_length=255)
+    auth = models.CharField(max_length=255)
+
+    user_agent = models.CharField(max_length=500, blank=True, default="")
+    label = models.CharField(max_length=120, blank=True, default="",
+                             help_text=_("Nom donné par l'utilisateur (ex: iPhone perso)."))
+    is_active = models.BooleanField(default=True, db_index=True)
+    last_used_at = models.DateTimeField(null=True, blank=True)
+    failure_count = models.PositiveSmallIntegerField(default=0)
+
+    class Meta:
+        verbose_name = _("Abonnement Web Push")
+        verbose_name_plural = _("Abonnements Web Push")
+        indexes = [
+            models.Index(fields=["user", "is_active"]),
+        ]
+
+    def __str__(self) -> str:
+        return f"WebPush({self.user_id}, {self.endpoint[:40]}…)"
+
+
 class Notification(BaseModel):
     recipient = models.ForeignKey(
         settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="notifications",

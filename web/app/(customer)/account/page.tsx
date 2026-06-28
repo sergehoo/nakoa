@@ -9,6 +9,7 @@ import { Loader2, ShieldCheck, MapPin, CreditCard } from "lucide-react";
 import { toast } from "sonner";
 
 import { useMe, useUpdateMe } from "@/hooks/use-auth";
+import { PushNotificationCard } from "@/components/notifications/push-notification-card";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -315,6 +316,9 @@ export default function AccountPage() {
           </Link>
         </Card>
       </div>
+
+      {/* Notifications push */}
+      <PushNotificationCard />
 
       {/* Sécurité */}
       <Card>

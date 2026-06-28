@@ -104,6 +104,8 @@ LOCAL_APPS = [
     "apps.dashboards",
     "apps.documents",
     "apps.storage",
+    "apps.revenue_engine",
+    "apps.promotions",
 ]
 
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
@@ -387,6 +389,17 @@ EMAIL_TIMEOUT = env.int("EMAIL_TIMEOUT", default=15)
 DEFAULT_FROM_EMAIL = env("DEFAULT_FROM_EMAIL", default="Nakoa <no-reply@nakoahub.com>")
 SERVER_EMAIL = env("SERVER_EMAIL", default=DEFAULT_FROM_EMAIL)
 EMAIL_SUBJECT_PREFIX = env("EMAIL_SUBJECT_PREFIX", default="[Nakoa] ")
+
+# ============================================================
+# Web Push (PWA — VAPID)
+# ============================================================
+# Génération des clés (à exécuter une fois en local) :
+#   python manage.py generate_vapid_keys
+# Puis copier les valeurs dans .env.prod
+VAPID_PUBLIC_KEY = env("VAPID_PUBLIC_KEY", default="")
+VAPID_PRIVATE_KEY = env("VAPID_PRIVATE_KEY", default="")
+VAPID_CLAIM_EMAIL = env("VAPID_CLAIM_EMAIL", default="mailto:tech@nakoahub.com")
+WEB_PUSH_TTL = env.int("WEB_PUSH_TTL", default=60 * 60 * 24)  # 24h
 
 # ============================================================
 # AI providers

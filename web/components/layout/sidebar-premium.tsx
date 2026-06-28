@@ -7,7 +7,7 @@ import {
   Activity, BarChart3, Bell, Boxes, Building2, ClipboardList,
   CreditCard, FileText, HelpCircle, Home, LayoutDashboard, MapPin,
   MessageSquare, Package, Printer, Search, Settings, ShieldCheck,
-  ShoppingCart, Sparkles, Star, Truck, Users, Wallet,
+  ShoppingCart, Sparkles, Star, Tag, TrendingUp, Truck, Users, Wallet,
   type LucideIcon,
 } from "lucide-react";
 
@@ -116,6 +116,9 @@ const NAV: Record<SidebarRole, NavSection[]> = {
       items: [
         { href: "/a/orders", label: "Commandes", icon: ShoppingCart },
         { href: "/a/finance", label: "Finance", icon: CreditCard },
+        { href: "/a/revenue", label: "Revenue Engine", icon: TrendingUp },
+        { href: "/a/subscriptions", label: "Abonnements", icon: Wallet },
+        { href: "/a/promotions", label: "Promotions", icon: Tag },
       ],
     },
     {
