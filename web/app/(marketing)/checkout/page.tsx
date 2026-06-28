@@ -103,35 +103,91 @@ export default function CheckoutPage() {
     if (submitting) return;
     setSubmitting(true);
     try {
-      // Crée une QuoteRequest groupant tous les articles. Le backend matche
-      // ensuite des imprimeurs et envoie les notifications.
-      const payload = {
-        title: `Commande Nakoa — ${items.length} article${items.length > 1 ? "s" : ""}`,
-        notes: notes || undefined,
-        delivery_address: address || undefined,
-        delivery_city: city || undefined,
-        delivery_phone: phone || undefined,
-        delivery_option: delivery.code,
-        payment_provider: paymentCode,
-        coupon_code: coupon?.code || undefined,
-        items: items.map((i: CartItem) => ({
-          product: i.productId,
-          quantity: i.quantity,
-          options: i.options,
-          notes: i.optionsLabel,
-        })),
-      };
-      await api.post(endpoints.quotes.create, payload);
-      toast.success("Commande envoyée 🎉", {
-        description: "Tu vas recevoir les offres des imprimeurs sous peu.",
-      });
+      // QuoteRequest est mono-produit côté backend. On crée donc un devis
+      // par article du panier — le client recevra plusieurs offres regroupées
+      // dans /quotes. Les métadonnées globales (livraison, paiement, coupon,
+      // notes) sont concaténées dans customer_notes pour la traçabilité.
+      const globalNotes = [
+        `Mode de livraison : ${delivery.label} (${delivery.eta})`,
+        `Mode de paiement : ${paymentCode}`,
+        coupon ? `Code promo appliqué : ${coupon.code}` : null,
+        notes ? `Notes client : ${notes}` : null,
+      ]
+        .filter(Boolean)
+        .join("\n");
+
+      const results = await Promise.allSettled(
+        items.map((i: CartItem) => {
+          // Construit option_values au format {option_id: value_id}
+          const option_values: Record<string, string> = {};
+          for (const [k, v] of Object.entries(i.options || {})) {
+            if (typeof v === "string") option_values[k] = v;
+          }
+          const itemNotes = [
+            i.optionsLabel ? `Détails : ${i.optionsLabel}` : null,
+            globalNotes,
+          ]
+            .filter(Boolean)
+            .join("\n");
+
+          return api.post(endpoints.quotes.create, {
+            product: i.productId,
+            quantity: i.quantity,
+            option_values,
+            delivery_city: city || undefined,
+            delivery_address: address || undefined,
+            customer_notes: itemNotes || undefined,
+          });
+        }),
+      );
+
+      const ok = results.filter((r) => r.status === "fulfilled").length;
+      const failed = results.length - ok;
+
+      if (ok === 0) {
+        // Tout a planté — récupère le détail de la première erreur pour le toast
+        const firstError = results.find((r) => r.status === "rejected") as
+          | PromiseRejectedResult
+          | undefined;
+        const err = firstError?.reason as {
+          response?: { status?: number; data?: { detail?: unknown; title?: string } };
+        } | undefined;
+        const detail = err?.response?.data?.detail;
+        const title = err?.response?.data?.title;
+        const message =
+          typeof detail === "string"
+            ? detail
+            : detail && typeof detail === "object"
+              ? Object.entries(detail as Record<string, unknown>)
+                  .map(([f, v]) => `${f}: ${Array.isArray(v) ? v.join(", ") : String(v)}`)
+                  .join(" · ")
+              : title || "Réessaie ou contacte le support.";
+        toast.error("Échec de la commande", { description: message });
+        return;
+      }
+
+      if (failed > 0) {
+        toast.warning(`${ok}/${items.length} devis créés`, {
+          description: `${failed} article(s) n'ont pas pu être envoyés.`,
+        });
+      } else {
+        toast.success("Commande envoyée 🎉", {
+          description:
+            items.length > 1
+              ? `${items.length} devis créés. Tu vas recevoir les offres bientôt.`
+              : "Tu vas recevoir les offres des imprimeurs sous peu.",
+        });
+      }
       clearCart();
       router.push("/quotes");
     } catch (e: unknown) {
-      const err = e as { response?: { data?: { detail?: unknown } } };
+      const err = e as { response?: { data?: { detail?: unknown; title?: string } } };
       const detail = err?.response?.data?.detail;
       toast.error("Échec de la commande", {
-        description: typeof detail === "string" ? detail : "Vérifie tes informations.",
+        description:
+          typeof detail === "string"
+            ? detail
+            : err?.response?.data?.title || "Vérifie tes informations et réessaie.",
       });
     } finally {
       setSubmitting(false);
