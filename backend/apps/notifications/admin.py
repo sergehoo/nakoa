@@ -1,5 +1,27 @@
 from django.contrib import admin
-from .models import Notification, NotificationTemplate, WebPushSubscription
+from .models import (
+    Notification, NotificationTemplate, NotificationType,
+    UserNotificationPreference, WebPushSubscription,
+)
+
+
+@admin.register(NotificationType)
+class NotificationTypeAdmin(admin.ModelAdmin):
+    list_display = (
+        "label", "code", "category", "is_active", "is_user_toggleable", "sort_order",
+    )
+    list_filter = ("category", "is_active", "is_user_toggleable")
+    search_fields = ("code", "label", "description")
+    list_editable = ("is_active", "is_user_toggleable", "sort_order")
+    prepopulated_fields = {"code": ("label",)}
+
+
+@admin.register(UserNotificationPreference)
+class UserNotificationPreferenceAdmin(admin.ModelAdmin):
+    list_display = ("user", "notification_type", "channels", "updated_at")
+    list_filter = ("notification_type",)
+    search_fields = ("user__email", "notification_type__code")
+    readonly_fields = ("created_at", "updated_at")
 
 @admin.register(Notification)
 class NotificationAdmin(admin.ModelAdmin):

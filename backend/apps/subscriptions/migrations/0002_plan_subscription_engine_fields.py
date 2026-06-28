@@ -97,6 +97,17 @@ class Migration(migrations.Migration):
         # 2) Remplit le champ code sur l'existant
         migrations.RunPython(_fill_codes, _noop_reverse),
 
+        # 2.5) Filet de sécurité — si la migration a été interrompue avant
+        # le marquage django_migrations, l'index unique LIKE peut subsister.
+        # On le drop défensivement avant le AlterField.
+        migrations.RunSQL(
+            sql=(
+                "DROP INDEX IF EXISTS subscriptions_plan_code_c3950c19_like; "
+                "ALTER TABLE subscriptions_plan DROP CONSTRAINT IF EXISTS subscriptions_plan_code_key;"
+            ),
+            reverse_sql=migrations.RunSQL.noop,
+        ),
+
         # 3) Ajoute la contrainte unique sur code
         migrations.AlterField(
             model_name="plan",

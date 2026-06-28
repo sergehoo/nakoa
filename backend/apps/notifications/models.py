@@ -69,6 +69,80 @@ class WebPushSubscription(BaseModel):
         return f"WebPush({self.user_id}, {self.endpoint[:40]}…)"
 
 
+class NotificationType(BaseModel):
+    """Type d'événement notifiable, administrable globalement par le Super Admin.
+
+    Le Super Admin peut, depuis le BO :
+    - activer/désactiver le type globalement (is_active)
+    - choisir les canaux par défaut (default_channels)
+    - décider si l'utilisateur peut surcharger (is_user_toggleable)
+    """
+
+    code = models.SlugField(_("code"), max_length=80, unique=True, db_index=True)
+    label = models.CharField(_("libellé"), max_length=160)
+    description = models.TextField(_("description"), blank=True, default="")
+    icon = models.CharField(_("icône"), max_length=64, blank=True, default="")
+
+    class Category(models.TextChoices):
+        TRANSACTIONAL = "transactional", _("Transactionnel")
+        MARKETING = "marketing", _("Marketing")
+        SYSTEM = "system", _("Système")
+        SECURITY = "security", _("Sécurité")
+
+    category = models.CharField(
+        _("catégorie"), max_length=20, choices=Category.choices,
+        default=Category.TRANSACTIONAL, db_index=True,
+    )
+
+    default_channels = models.JSONField(
+        _("canaux par défaut"), default=list, blank=True,
+        help_text=_("Liste de codes Channel (in_app, email, sms, push, whatsapp)."),
+    )
+    is_active = models.BooleanField(_("type actif globalement"), default=True, db_index=True)
+    is_user_toggleable = models.BooleanField(
+        _("modifiable par l'utilisateur"), default=True,
+        help_text=_("Si False, l'utilisateur ne peut pas désactiver ce type."),
+    )
+
+    sort_order = models.PositiveIntegerField(default=100, db_index=True)
+
+    class Meta(BaseModel.Meta):
+        ordering = ("sort_order", "label")
+        verbose_name = _("Type de notification")
+        verbose_name_plural = _("Types de notifications")
+
+    def __str__(self) -> str:
+        return f"{self.label} ({self.code})"
+
+
+class UserNotificationPreference(BaseModel):
+    """Préférence utilisateur pour un type donné.
+
+    Si absent → fallback sur NotificationType.default_channels.
+    Si présent → l'utilisateur a personnalisé : channels = liste effective.
+    """
+
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL, on_delete=models.CASCADE,
+        related_name="notification_preferences",
+    )
+    notification_type = models.ForeignKey(
+        NotificationType, on_delete=models.CASCADE, related_name="user_preferences",
+    )
+    channels = models.JSONField(
+        _("canaux activés"), default=list, blank=True,
+        help_text=_("Liste vide = type désactivé pour cet utilisateur."),
+    )
+
+    class Meta(BaseModel.Meta):
+        unique_together = (("user", "notification_type"),)
+        verbose_name = _("Préférence notification")
+        verbose_name_plural = _("Préférences notifications")
+        indexes = [
+            models.Index(fields=["user", "notification_type"]),
+        ]
+
+
 class Notification(BaseModel):
     recipient = models.ForeignKey(
         settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="notifications",

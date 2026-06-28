@@ -76,6 +76,11 @@ export const endpoints = {
   public: {
     landingStats: "/analytics/public/stats/",
   },
+  notifPrefs: {
+    me: "/notifications/preferences/me/",
+    types: "/notifications/types/",
+    typeDetail: (id: string) => `/notifications/types/${id}/`,
+  },
   push: {
     publicKey: "/notifications/push/public-key/",
     subscribe: "/notifications/push/subscribe/",
