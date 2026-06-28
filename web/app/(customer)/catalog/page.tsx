@@ -16,6 +16,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import type { Product } from "@/lib/api/types";
 import { cn } from "@/lib/utils";
 
 const ALL = "__all__";
@@ -44,8 +45,8 @@ export default function CatalogPage() {
     page_size: 60,
   });
 
-  const sorted = useMemo(() => {
-    const list = products?.results ? [...products.results] : [];
+  const sorted = useMemo<Product[]>(() => {
+    const list: Product[] = products?.results ? [...products.results] : [];
     list.sort((a, b) => {
       if (sort === "name") return a.name.localeCompare(b.name);
       if (sort === "lead_time") return (a.lead_time_days ?? 99) - (b.lead_time_days ?? 99);
@@ -195,7 +196,7 @@ export default function CatalogPage() {
 // Card produit premium
 // ============================================================================
 
-function ProductCard({ product }: { product: Awaited<ReturnType<typeof useProducts>>["data"] extends { results: (infer T)[] } ? T : never }) {
+function ProductCard({ product }: { product: Product }) {
   return (
     <Link href={`/catalog/${product.slug}`} className="group block">
       <Card
