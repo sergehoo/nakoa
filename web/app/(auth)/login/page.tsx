@@ -70,16 +70,62 @@ function LoginForm() {
       router.push(destination);
       router.refresh();
     } catch (e: unknown) {
-      const err = e as { response?: { data?: { detail?: string; title?: string } } };
-      const detail = err?.response?.data?.title || err?.response?.data?.detail || "";
-      if (typeof detail === "string" && detail.toLowerCase().includes("2fa")) {
+      const err = e as {
+        response?: {
+          status?: number;
+          data?: {
+            detail?: string | Record<string, string[] | string>;
+            title?: string;
+          };
+        };
+      };
+      const status = err?.response?.status;
+      const detail = err?.response?.data?.detail;
+      const title = err?.response?.data?.title;
+
+      // Détection 2FA (string ou title)
+      const detailStr = typeof detail === "string" ? detail : "";
+      const hint = `${detailStr} ${title ?? ""}`.toLowerCase();
+      if (hint.includes("2fa") || hint.includes("two-factor")) {
         setNeeds2FA(true);
         toast.message("Code 2FA requis", {
           description: "Entrez le code à 6 chiffres de votre application.",
         });
+        return;
+      }
+
+      // Erreurs détaillées par champ (rare en login, mais possible)
+      if (detail && typeof detail === "object") {
+        const messages = Object.entries(detail).map(([f, m]) => {
+          const list = Array.isArray(m) ? m : [String(m)];
+          return `${f === "email" ? "Email" : f === "password" ? "Mot de passe" : f} : ${list[0]}`;
+        });
+        toast.error(title || "Connexion échouée", {
+          description: messages.join(" · "),
+        });
+        return;
+      }
+
+      // Messages explicites selon status
+      if (status === 401) {
+        toast.error("Identifiants incorrects", {
+          description: "Email ou mot de passe invalide.",
+        });
+      } else if (status === 403) {
+        toast.error("Compte bloqué", {
+          description: detailStr || "Votre compte est suspendu. Contactez le support.",
+        });
+      } else if (status === 429) {
+        toast.error("Trop de tentatives", {
+          description: "Patientez quelques minutes avant de réessayer.",
+        });
+      } else if (status && status >= 500) {
+        toast.error("Erreur serveur", {
+          description: "Le serveur est temporairement indisponible.",
+        });
       } else {
         toast.error("Connexion échouée", {
-          description: detail || "Vérifiez vos identifiants.",
+          description: detailStr || title || "Vérifiez vos identifiants.",
         });
       }
     }

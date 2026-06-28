@@ -35,11 +35,34 @@ function RegisterForm() {
   const {
     register,
     handleSubmit,
+    setError,
     formState: { errors },
   } = useForm<FormData>({
     resolver: zodResolver(schema),
     defaultValues: { country: "CI" },
   });
+
+  // Mappe le nom de champ backend vers le nom de champ frontend
+  const FIELD_MAP: Record<string, keyof FormData> = {
+    email: "email",
+    phone: "phone",
+    password: "password",
+    first_name: "first_name",
+    last_name: "last_name",
+    country: "country",
+  };
+
+  // Messages plus parlants pour les erreurs courantes du backend
+  function humanize(field: string, raw: string): string {
+    const lower = raw.toLowerCase();
+    if (lower.includes("existe déjà") || lower.includes("already exists")) {
+      if (field === "email") return "Cet email est déjà utilisé. Connectez-vous ou utilisez un autre email.";
+      if (field === "phone") return "Ce numéro est déjà associé à un compte.";
+    }
+    if (lower.includes("valide") && field === "email") return "Format d'email invalide.";
+    if (lower.includes("password") && lower.includes("commun")) return "Mot de passe trop commun.";
+    return raw;
+  }
 
   const onSubmit = async (data: FormData) => {
     try {
@@ -54,9 +77,59 @@ function RegisterForm() {
       });
       router.push(`/otp?identifier=${encodeURIComponent(data.email)}&purpose=email_verify`);
     } catch (e: unknown) {
-      const err = e as { response?: { data?: { detail?: string } } };
+      const err = e as {
+        response?: {
+          status?: number;
+          data?: {
+            detail?: string | Record<string, string[] | string>;
+            title?: string;
+          };
+        };
+      };
+      const status = err?.response?.status;
       const detail = err?.response?.data?.detail;
-      toast.error("Inscription échouée", { description: typeof detail === "string" ? detail : "Réessayez." });
+      const title = err?.response?.data?.title;
+
+      // Cas 1 : detail est un objet { field: ["msg1", "msg2"], ... }
+      if (detail && typeof detail === "object") {
+        const fieldErrors: string[] = [];
+        for (const [backendField, msgs] of Object.entries(detail)) {
+          const frontField = FIELD_MAP[backendField];
+          const list = Array.isArray(msgs) ? msgs : [String(msgs)];
+          const message = humanize(backendField, list[0] ?? "Erreur");
+
+          if (frontField) {
+            setError(frontField, { type: "server", message });
+          }
+          fieldErrors.push(`${backendField}: ${message}`);
+        }
+
+        toast.error(title || "Vérifiez les champs", {
+          description: fieldErrors.length
+            ? "Certaines informations doivent être corrigées."
+            : "Erreur de validation.",
+        });
+        return;
+      }
+
+      // Cas 2 : detail est une string simple
+      if (typeof detail === "string") {
+        toast.error(title || "Inscription échouée", { description: detail });
+        return;
+      }
+
+      // Cas 3 : pas de detail → message générique selon le statut
+      if (status === 429) {
+        toast.error("Trop de tentatives", {
+          description: "Patientez quelques minutes avant de réessayer.",
+        });
+      } else if (status && status >= 500) {
+        toast.error("Erreur serveur", {
+          description: "Le serveur est temporairement indisponible. Réessayez dans un instant.",
+        });
+      } else {
+        toast.error("Inscription échouée", { description: title || "Réessayez." });
+      }
     }
   };
 
